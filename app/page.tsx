@@ -36,11 +36,32 @@ import {
   Copy,
   DollarSign,
   Sparkles,
+  Calculator,
 } from "lucide-react"
 import Link from "next/link"
 import { useWallet } from "@/lib/wallet-context"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
+
+// Function to calculate dynamic prize pool
+const calculateDynamicPrizePool = (participants: number, entryFee: number): number => {
+  const totalCollected = participants * entryFee
+  const platformCommission = totalCollected * 0.4 // 40% platform commission
+  const finalPrizePool = totalCollected - platformCommission
+  return Math.round(finalPrizePool)
+}
+
+// Function to get prize pool calculation details
+const getPrizePoolDetails = (participants: number, entryFee: number) => {
+  const totalCollected = participants * entryFee
+  const platformCommission = totalCollected * 0.4
+  const finalPrizePool = totalCollected - platformCommission
+  return {
+    totalCollected: Math.round(totalCollected),
+    platformCommission: Math.round(platformCommission),
+    finalPrizePool: Math.round(finalPrizePool)
+  }
+}
 
 // Optimized contest data structure - only essential fields for immediate display
 const contestEssentials = [
@@ -53,7 +74,6 @@ const contestEssentials = [
     creator: "Speed Coders",
     participants: 21,
     maxParticipants: 25,
-    prizePool: 1900,
     entryFee: 80,
     prizeType: "cash",
     difficulty: "intermediate",
@@ -143,7 +163,6 @@ const contestEssentials = [
     creator: "Beginner's Hub",
     participants: 67,
     maxParticipants: 100,
-    prizePool: 1425,
     entryFee: 15,
     prizeType: "cash",
     difficulty: "beginner",
@@ -160,7 +179,6 @@ const contestEssentials = [
     creator: "Logic Academy",
     participants: 43,
     maxParticipants: 60,
-    prizePool: 570,
     entryFee: 10,
     prizeType: "cash",
     difficulty: "beginner",
@@ -177,7 +195,6 @@ const contestEssentials = [
     creator: "Vibe Coders",
     participants: 45,
     maxParticipants: 80,
-    prizePool: 760,
     entryFee: 10,
     prizeType: "cash",
     difficulty: "beginner",
@@ -194,7 +211,6 @@ const contestEssentials = [
     creator: "Elite Coding Club",
     participants: 23,
     maxParticipants: 25,
-    prizePool: 2375,
     entryFee: 100,
     prizeType: "cash",
     difficulty: "intermediate",
@@ -211,7 +227,6 @@ const contestEssentials = [
     creator: "Logic League Pro",
     participants: 18,
     maxParticipants: 20,
-    prizePool: 1425,
     entryFee: 75,
     prizeType: "cash",
     difficulty: "intermediate",
@@ -228,8 +243,7 @@ const contestEssentials = [
     creator: "Design Elite Pro",
     participants: 15,
     maxParticipants: 20,
-    prizePool: 1900,
-    entryFee: 100,
+    entryFee: 125,
     prizeType: "cash",
     difficulty: "intermediate",
     duration: "3 hours",
@@ -237,72 +251,83 @@ const contestEssentials = [
     featured: true,
   },
   {
-    id: "mega-contest-1",
-    title: "🚀 Grand Championship Arena",
-    description:
-      "The ultimate coding championship! Massive prize pool with hundreds of participants competing for glory.",
+    id: "mega-contest-dsa-1",
+    title: "🚀 Mega DSA Championship",
+    description: "The biggest DSA contest of the month! Open to all skill levels with massive prize pool.",
     type: "dsa",
     category: "mega-contest",
-    creator: "Codarena Championship",
-    participants: 487,
-    maxParticipants: 500,
-    prizePool: 47500,
+    creator: "Mega Contest Pro",
+    participants: 475,
+    maxParticipants: 1000,
     entryFee: 100,
     prizeType: "cash",
-    difficulty: "advanced",
-    duration: "4 hours",
-    tags: ["Mega Contest", "Championship", "Massive Prize"],
+    difficulty: "mixed",
+    duration: "3 hours",
+    tags: ["Mega Contest", "Championship", "Massive Pool"],
     featured: true,
   },
   {
-    id: "mega-vibe-1",
-    title: "🎶 Global Vibe Coding Festival",
-    description: "The world's largest vibe coding event! Creative challenges with music from around the globe.",
-    type: "vibe-coding",
+    id: "mega-contest-logic-1",
+    title: "🧠 Mega Logic Championship",
+    description: "Ultimate logic contest with the biggest prize pool! Test your reasoning skills.",
+    type: "logic",
     category: "mega-contest",
-    creator: "Global Vibe Network",
-    participants: 298,
-    maxParticipants: 350,
-    prizePool: 16625,
+    creator: "Logic Championship Pro",
+    participants: 332,
+    maxParticipants: 500,
     entryFee: 50,
     prizeType: "cash",
-    difficulty: "intermediate",
-    duration: "3 hours",
-    tags: ["Mega Contest", "Vibe Coding", "Global"],
+    difficulty: "mixed",
+    duration: "2 hours",
+    tags: ["Mega Contest", "Logic", "Championship"],
+    featured: true,
+  },
+  {
+    id: "mega-contest-uiux-1",
+    title: "🎨 Mega Design Championship",
+    description: "The ultimate design contest! Showcase your creativity and win big prizes.",
+    type: "ui-ux",
+    category: "mega-contest",
+    creator: "Design Championship Pro",
+    participants: 285,
+    maxParticipants: 400,
+    entryFee: 100,
+    prizeType: "cash",
+    difficulty: "mixed",
+    duration: "4 hours",
+    tags: ["Mega Contest", "Design", "Creative"],
     featured: true,
   },
   {
     id: "high-roller-dsa-1",
-    title: "💎 Diamond League Challenge",
-    description: "Ultra-premium contest for coding elites. Advanced algorithms, high stakes, massive rewards!",
+    title: "💎 High Roller DSA Elite",
+    description: "Exclusive high-stakes contest for elite coders. Massive entry fee, massive rewards.",
     type: "dsa",
     category: "high-roller",
-    creator: "Diamond Coders Elite",
-    participants: 34,
-    maxParticipants: 50,
-    prizePool: 23750,
+    creator: "High Roller Elite",
+    participants: 95,
+    maxParticipants: 200,
     entryFee: 500,
     prizeType: "cash",
     difficulty: "expert",
-    duration: "3 hours",
-    tags: ["High Roller", "Elite", "Premium"],
+    duration: "4 hours",
+    tags: ["High Roller", "Elite", "High Stakes"],
     featured: true,
   },
   {
     id: "high-roller-logic-1",
-    title: "🧠 Mastermind Elite Series",
-    description: "The most challenging logic contest for intellectual giants. High entry, higher rewards!",
+    title: "💎 High Roller Logic Elite",
+    description: "Premium logic contest for the elite. High entry fee, exceptional rewards.",
     type: "logic",
     category: "high-roller",
-    creator: "Mastermind Society",
-    participants: 28,
-    maxParticipants: 40,
-    prizePool: 9500,
+    creator: "Logic Elite Pro",
+    participants: 67,
+    maxParticipants: 100,
     entryFee: 250,
     prizeType: "cash",
     difficulty: "expert",
-    duration: "90 minutes",
-    tags: ["High Roller", "Logic", "Elite"],
+    duration: "2.5 hours",
+    tags: ["High Roller", "Logic", "Premium"],
     featured: true,
   },
 ]
@@ -500,7 +525,7 @@ function PaymentConfirmationDialog({
                 Prize Pool
               </h4>
               <div className="text-center">
-                <p className="md-headline-6 font-bold text-yellow-700">₹{contest.prizePool.toLocaleString("en-IN")}</p>
+                <p className="md-headline-6 font-bold text-yellow-700">₹{calculateDynamicPrizePool(contest.participants, contest.entryFee).toLocaleString("en-IN")}</p>
                 <p className="text-xs text-yellow-600 mt-1">
                   {/*contest.prizeDistribution.reduce((sum: number, p: any) => sum + p.count, 0)*/} winners
                 </p>
@@ -569,7 +594,7 @@ function PrizeBreakdownDialog({
           </DialogTitle>
           <DialogDescription>
             {contest.prizeType === "cash"
-              ? `Total prize pool: ₹${contest.prizePool.toLocaleString("en-IN")} • Entry fee: ₹${contest.entryFee}`
+              ? `Total prize pool: ₹${calculateDynamicPrizePool(contest.participants, contest.entryFee).toLocaleString("en-IN")} • Entry fee: ₹${contest.entryFee}`
               : "Free practice contest with digital rewards"}
           </DialogDescription>
         </DialogHeader>
@@ -580,11 +605,34 @@ function PrizeBreakdownDialog({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
           ) : contest.prizeType === "cash" ? (
-            <MaterialCard elevation={1} className="p-4">
-              <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                <Award className="h-4 w-4" />
-                Winner Distribution
-              </h4>
+            <>
+              {/* Prize Pool Calculation Breakdown */}
+              <MaterialCard elevation={1} className="p-4 mb-4 bg-blue-50">
+                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <Calculator className="h-4 w-4" />
+                  Prize Pool Calculation
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Collected:</span>
+                    <span className="font-medium">₹{getPrizePoolDetails(contest.participants, contest.entryFee).totalCollected.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Platform Commission (40%):</span>
+                    <span className="font-medium text-red-600">-₹{getPrizePoolDetails(contest.participants, contest.entryFee).platformCommission.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2">
+                    <span className="font-semibold text-gray-900">Final Prize Pool:</span>
+                    <span className="font-bold text-green-600">₹{getPrizePoolDetails(contest.participants, contest.entryFee).finalPrizePool.toLocaleString("en-IN")}</span>
+                  </div>
+                </div>
+              </MaterialCard>
+
+              <MaterialCard elevation={1} className="p-4">
+                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <Award className="h-4 w-4" />
+                  Winner Distribution
+                </h4>
               <div className="space-y-3">
                 {details?.prizeDistribution?.map((prize: any, index: number) => (
                   <div
@@ -611,6 +659,7 @@ function PrizeBreakdownDialog({
                 )) || <div className="text-center py-4 text-gray-500">Prize details loading...</div>}
               </div>
             </MaterialCard>
+            </>
           ) : (
             <MaterialCard elevation={1} className="p-4 bg-green-50">
               <h4 className="font-medium text-green-900 mb-3 flex items-center gap-2">
@@ -1870,7 +1919,7 @@ export default function CodarenaApp() {
                                 <span className="text-sm font-medium text-gray-900">Prize Pool</span>
                               </div>
                               <span className="text-lg font-bold text-green-600">
-                                ₹{contest.prizePool.toLocaleString("en-IN")}
+                                ₹{calculateDynamicPrizePool(contest.participants, contest.entryFee).toLocaleString("en-IN")}
                               </span>
                             </div>
                           </div>

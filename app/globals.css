@@ -1,0 +1,535 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Using system font stack with Roboto preference for Material Design */
+
+/* Material Design CSS Variables */
+:root {
+  /* Primary Colors - Material Blue */
+  --md-primary: #1976d2;
+  --md-primary-variant: #1565c0;
+  --md-primary-container: #e3f2fd;
+  --md-on-primary: #ffffff;
+  --md-on-primary-container: #0d47a1;
+
+  /* Secondary Colors */
+  --md-secondary: #03dac6;
+  --md-secondary-variant: #018786;
+  --md-secondary-container: #e0f2f1;
+  --md-on-secondary: #000000;
+
+  /* Surface Colors */
+  --md-surface: #ffffff;
+  --md-surface-variant: #f5f5f5;
+  --md-on-surface: #212121;
+  --md-on-surface-variant: #757575;
+
+  /* Background */
+  --md-background: #fafafa;
+  --md-on-background: #212121;
+
+  /* Error */
+  --md-error: #b00020;
+  --md-on-error: #ffffff;
+
+  /* Success */
+  --md-success: #4caf50;
+  --md-on-success: #ffffff;
+
+  /* Warning */
+  --md-warning: #ff9800;
+  --md-on-warning: #000000;
+
+  /* Elevation Shadows */
+  --md-elevation-1: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
+  --md-elevation-2: 0px 3px 6px rgba(0, 0, 0, 0.16), 0px 3px 6px rgba(0, 0, 0, 0.23);
+  --md-elevation-3: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+  --md-elevation-4: 0px 14px 28px rgba(0, 0, 0, 0.25), 0px 10px 10px rgba(0, 0, 0, 0.22);
+  --md-elevation-8: 0px 20px 40px rgba(0, 0, 0, 0.3), 0px 15px 12px rgba(0, 0, 0, 0.22);
+
+  /* Typography Scale */
+  --md-headline-1: 6rem; /* 96px */
+  --md-headline-2: 3.75rem; /* 60px */
+  --md-headline-3: 3rem; /* 48px */
+  --md-headline-4: 2.125rem; /* 34px */
+  --md-headline-5: 1.5rem; /* 24px */
+  --md-headline-6: 1.25rem; /* 20px */
+  --md-subtitle-1: 1rem; /* 16px */
+  --md-subtitle-2: 0.875rem; /* 14px */
+  --md-body-1: 1rem; /* 16px */
+  --md-body-2: 0.875rem; /* 14px */
+  --md-button: 0.875rem; /* 14px */
+  --md-caption: 0.75rem; /* 12px */
+  --md-overline: 0.625rem; /* 10px */
+
+  /* Spacing Scale - 8px grid */
+  --md-spacing-1: 0.25rem; /* 4px */
+  --md-spacing-2: 0.5rem; /* 8px */
+  --md-spacing-3: 0.75rem; /* 12px */
+  --md-spacing-4: 1rem; /* 16px */
+  --md-spacing-5: 1.25rem; /* 20px */
+  --md-spacing-6: 1.5rem; /* 24px */
+  --md-spacing-8: 2rem; /* 32px */
+  --md-spacing-10: 2.5rem; /* 40px */
+  --md-spacing-12: 3rem; /* 48px */
+  --md-spacing-16: 4rem; /* 64px */
+
+  /* Border Radius */
+  --md-radius-small: 0.25rem; /* 4px */
+  --md-radius-medium: 0.5rem; /* 8px */
+  --md-radius-large: 1rem; /* 16px */
+  --md-radius-extra-large: 1.75rem; /* 28px */
+
+  /* Transitions */
+  --md-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --md-transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --md-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+* {
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+body {
+  background-color: var(--md-background);
+  color: var(--md-on-background);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Material Design Typography Classes */
+.md-headline-1 {
+  font-size: var(--md-headline-1);
+  font-weight: 300;
+  line-height: 1.17;
+  letter-spacing: -0.01562em;
+}
+.md-headline-2 {
+  font-size: var(--md-headline-2);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.00833em;
+}
+.md-headline-3 {
+  font-size: var(--md-headline-3);
+  font-weight: 400;
+  line-height: 1.17;
+  letter-spacing: 0;
+}
+.md-headline-4 {
+  font-size: var(--md-headline-4);
+  font-weight: 400;
+  line-height: 1.24;
+  letter-spacing: 0.00735em;
+}
+.md-headline-5 {
+  font-size: var(--md-headline-5);
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0;
+}
+.md-headline-6 {
+  font-size: var(--md-headline-6);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.0125em;
+}
+.md-subtitle-1 {
+  font-size: var(--md-subtitle-1);
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.00938em;
+}
+.md-subtitle-2 {
+  font-size: var(--md-subtitle-2);
+  font-weight: 500;
+  line-height: 1.57;
+  letter-spacing: 0.00714em;
+}
+.md-body-1 {
+  font-size: var(--md-body-1);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+}
+.md-body-2 {
+  font-size: var(--md-body-2);
+  font-weight: 400;
+  line-height: 1.43;
+  letter-spacing: 0.01071em;
+}
+.md-button {
+  font-size: var(--md-button);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.02857em;
+  text-transform: uppercase;
+}
+.md-caption {
+  font-size: var(--md-caption);
+  font-weight: 400;
+  line-height: 1.33;
+  letter-spacing: 0.03333em;
+}
+.md-overline {
+  font-size: var(--md-overline);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.08333em;
+  text-transform: uppercase;
+}
+
+/* Material Design Elevation Classes */
+.md-elevation-0 {
+  box-shadow: none;
+}
+.md-elevation-1 {
+  box-shadow: var(--md-elevation-1);
+}
+.md-elevation-2 {
+  box-shadow: var(--md-elevation-2);
+}
+.md-elevation-3 {
+  box-shadow: var(--md-elevation-3);
+}
+.md-elevation-4 {
+  box-shadow: var(--md-elevation-4);
+}
+.md-elevation-8 {
+  box-shadow: var(--md-elevation-8);
+}
+
+/* Material Design Button Styles */
+.md-button-contained {
+  @apply inline-flex items-center justify-center px-6 py-3 rounded-md transition-all duration-300;
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: var(--md-elevation-2);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02857em;
+}
+
+.md-button-contained:hover {
+  box-shadow: var(--md-elevation-4);
+  transform: translateY(-1px);
+}
+
+.md-button-contained:active {
+  box-shadow: var(--md-elevation-8);
+}
+
+.md-button-outlined {
+  @apply inline-flex items-center justify-center px-6 py-3 rounded-md transition-all duration-300;
+  background-color: transparent;
+  color: var(--md-primary);
+  border: 1px solid var(--md-primary);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02857em;
+}
+
+.md-button-outlined:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+.md-button-text {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md transition-all duration-300;
+  background-color: transparent;
+  color: var(--md-primary);
+  position: relative;
+  overflow: hidden;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02857em;
+}
+
+.md-button-text:hover {
+  background-color: rgba(25, 118, 210, 0.04);
+}
+
+/* Ripple Effect */
+.md-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.md-ripple::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.md-ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Material Design Card */
+.md-card {
+  background-color: var(--md-surface);
+  border-radius: var(--md-radius-medium);
+  box-shadow: var(--md-elevation-1);
+  transition: box-shadow var(--md-transition-standard);
+}
+
+.md-card:hover {
+  box-shadow: var(--md-elevation-2);
+}
+
+/* Material Design Input Fields */
+.md-input {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-md transition-all duration-300;
+  background-color: var(--md-surface);
+  color: var(--md-on-surface);
+}
+
+.md-input:focus {
+  outline: none;
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+/* Material Design Badge */
+.md-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-sm font-medium;
+  background-color: var(--md-surface-variant);
+  color: var(--md-on-surface-variant);
+}
+
+.md-badge-primary {
+  background-color: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+
+/* Grid System */
+.md-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--md-spacing-4);
+  padding-right: var(--md-spacing-4);
+}
+
+@media (min-width: 600px) {
+  .md-container {
+    max-width: 600px;
+    padding-left: var(--md-spacing-6);
+    padding-right: var(--md-spacing-6);
+  }
+}
+
+@media (min-width: 960px) {
+  .md-container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .md-container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .md-container {
+    max-width: 1920px;
+  }
+}
+
+/* Animation Classes */
+.md-fade-in {
+  animation: fadeIn var(--md-transition-standard) ease-out;
+}
+
+.md-slide-up {
+  animation: slideUp var(--md-transition-standard) ease-out;
+}
+
+.md-scale-in {
+  animation: scaleIn var(--md-transition-standard) ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive breakpoints following Material Design */
+.md-breakpoint-xs {
+  @media (max-width: 599px) {
+    @content;
+  }
+}
+.md-breakpoint-sm {
+  @media (min-width: 600px) and (max-width: 959px) {
+    @content;
+  }
+}
+.md-breakpoint-md {
+  @media (min-width: 960px) and (max-width: 1279px) {
+    @content;
+  }
+}
+.md-breakpoint-lg {
+  @media (min-width: 1280px) and (max-width: 1919px) {
+    @content;
+  }
+}
+.md-breakpoint-xl {
+  @media (min-width: 1920px) {
+    @content;
+  }
+}
+
+/* Accessibility */
+.md-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicators */
+.md-focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--md-primary);
+}
+
+/* Loading states */
+.md-loading {
+  position: relative;
+  color: transparent;
+}
+
+.md-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--md-primary);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error states */
+.md-error {
+  color: var(--md-error);
+  border-color: var(--md-error);
+}
+
+/* Success states */
+.md-success {
+  color: var(--md-success);
+  border-color: var(--md-success);
+}
+
+/* Empty states */
+.md-empty-state {
+  text-align: center;
+  padding: var(--md-spacing-16) var(--md-spacing-8);
+  color: var(--md-on-surface-variant);
+}
+
+/* Floating Action Button */
+.md-fab {
+  @apply fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center;
+  background-color: var(--md-primary);
+  color: var(--md-on-primary);
+  box-shadow: var(--md-elevation-3);
+  transition: all var(--md-transition-standard);
+  z-index: 50;
+}
+
+.md-fab:hover {
+  box-shadow: var(--md-elevation-4);
+  transform: scale(1.05);
+}
+
+.md-fab:active {
+  transform: scale(0.95);
+}
+
+/* Snackbar */
+.md-snackbar {
+  @apply fixed bottom-6 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-md;
+  background-color: rgba(33, 33, 33, 0.9);
+  color: white;
+  box-shadow: var(--md-elevation-3);
+  z-index: 60;
+  animation: slideUp var(--md-transition-standard) ease-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-surface-variant);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--md-on-surface-variant);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-on-surface);
+}

@@ -21,7 +21,7 @@ import {
   Award,
   Star,
   Gift,
-  IndianRupee,
+  Coins,
   CreditCard,
   Wallet,
   AlertCircle,
@@ -357,6 +357,11 @@ const ContestSkeleton = () => (
   </div>
 )
 
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
+
 export default function ContestDetailsPage() {
   const params = useParams()
   const router = useRouter()
@@ -644,8 +649,8 @@ export default function ContestDetailsPage() {
 
             <div className="flex items-center gap-3">
               <Link href="/wallet">
-                <MaterialButton variant="text" size="medium" startIcon={<Wallet className="h-4 w-4" />}>
-                  ₹{balance.toLocaleString("en-IN")}
+                <MaterialButton variant="text" size="medium" startIcon={<Coins className="h-4 w-4" />}>
+                  {formatCCAmount(balance)}
                 </MaterialButton>
               </Link>
             </div>

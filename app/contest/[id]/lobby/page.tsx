@@ -37,6 +37,7 @@ import {
   Camera,
   Monitor,
   Mic,
+  Coins,
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
@@ -1022,6 +1023,11 @@ function ContestRulesDialog({
   )
 }
 
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
+
 export default function ContestLobbyPage() {
   const params = useParams()
   const router = useRouter()
@@ -1285,8 +1291,8 @@ export default function ContestLobbyPage() {
 
             <div className="flex items-center gap-3">
               <Link href="/wallet">
-                <MaterialButton variant="text" size="medium" startIcon={<Wallet className="h-4 w-4" />}>
-                  ₹{balance.toLocaleString("en-IN")}
+                <MaterialButton variant="text" size="medium" startIcon={<Coins className="h-4 w-4" />}>
+                  {formatCCAmount(balance)}
                 </MaterialButton>
               </Link>
             </div>
@@ -1582,7 +1588,10 @@ export default function ContestLobbyPage() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Prize Pool:</span>
-                        <span className="font-medium text-green-600">₹{contest.prizePool.toLocaleString("en-IN")}</span>
+                        <span className="font-medium text-green-600 flex items-center gap-1">
+                          <Coins className="h-3 w-3" />
+                          {formatCCAmount(contest.prizePool)}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Winners:</span>
@@ -1592,8 +1601,9 @@ export default function ContestLobbyPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Top Prize:</span>
-                        <span className="font-medium text-green-600">
-                          ₹{Math.max(...contest.prizeDistribution.map((p: any) => p.amount)).toLocaleString("en-IN")}
+                        <span className="font-medium text-green-600 flex items-center gap-1">
+                          <Coins className="h-3 w-3" />
+                          {formatCCAmount(Math.max(...contest.prizeDistribution.map((p: any) => p.amount)))}
                         </span>
                       </div>
                     </div>

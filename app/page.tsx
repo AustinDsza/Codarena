@@ -84,7 +84,7 @@ const contestEssentials = [
     prizeType: "cash",
     difficulty: "intermediate",
     duration: "45 minutes",
-    startTime: new Date(Date.now() + 1.5 * 60 * 1000),
+    startTime: new Date(Date.now() - 5 * 60 * 1000), // Started 5 minutes ago
     tags: ["Lightning Round", "Quick", "High Stakes"],
     featured: true,
     isLive: true,

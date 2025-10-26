@@ -752,7 +752,7 @@ export default function CreateContestPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-md sticky top-0 z-50">
+      <header className="bg-white shadow-md sticky top-0 z-[var(--z-sticky)]">
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -1101,7 +1101,7 @@ export default function CreateContestPage() {
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Step 1: Contest Type */}
             {currentStep === 1 && (
-              <div className="p-8">
+              <div className="p-8 min-h-[600px] overflow-y-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-medium text-gray-900 mb-4">Choose Contest Type</h2>
                   <p className="text-gray-600 text-lg">Select the type of challenge you want to host</p>
@@ -1262,7 +1262,7 @@ export default function CreateContestPage() {
 
             {/* Step 2: Contest Details & Pricing */}
             {currentStep === 2 && (
-              <div className="p-8">
+              <div className="p-8 min-h-[600px] overflow-y-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-medium text-gray-900 mb-4">Contest Details & Pricing</h2>
                   <p className="text-gray-600 text-lg">Configure timing, difficulty, and prize structure</p>
@@ -1690,7 +1690,7 @@ export default function CreateContestPage() {
 
             {/* Step 3: Configuration */}
             {currentStep === 3 && (
-              <div className="p-8">
+              <div className="p-8 min-h-[600px] overflow-y-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-medium text-gray-900 mb-4">Contest Configuration</h2>
                   <p className="text-gray-600 text-lg">Set up questions, security, and advanced settings</p>
@@ -2288,7 +2288,7 @@ export default function CreateContestPage() {
 
             {/* Step 4: Review & Submit */}
             {currentStep === 4 && (
-              <div className="p-8">
+              <div className="p-8 min-h-[600px] overflow-y-auto">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-medium text-gray-900 mb-4">Review & Submit</h2>
                   <p className="text-gray-600 text-lg">Review your contest details before publishing</p>

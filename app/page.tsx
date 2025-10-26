@@ -1400,7 +1400,7 @@ export default function CodarenaApp() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header - Matching the provided design */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-[var(--z-sticky)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo Section - Matching the design */}

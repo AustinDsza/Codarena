@@ -487,6 +487,21 @@ body {
   color: var(--md-on-surface-variant);
 }
 
+/* Z-Index Hierarchy - Proper layering system */
+:root {
+  /* Base layers */
+  --z-base: 0;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-tooltip: 70;
+  --z-toast: 80;
+  --z-maximum: 9999;
+}
+
 /* Floating Action Button */
 .md-fab {
   @apply fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center;
@@ -494,7 +509,7 @@ body {
   color: var(--md-on-primary);
   box-shadow: var(--md-elevation-3);
   transition: all var(--md-transition-standard);
-  z-index: 50;
+  z-index: var(--z-fixed);
 }
 
 .md-fab:hover {
@@ -512,8 +527,120 @@ body {
   background-color: rgba(33, 33, 33, 0.9);
   color: white;
   box-shadow: var(--md-elevation-3);
-  z-index: 60;
+  z-index: var(--z-toast);
   animation: slideUp var(--md-transition-standard) ease-out;
+}
+
+/* Modal and Dialog fixes */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-modal-backdrop);
+}
+
+.modal-content {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-modal);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+  padding-right: var(--scrollbar-width, 0);
+}
+
+/* Dropdown fixes */
+.dropdown-content {
+  z-index: var(--z-dropdown);
+  position: absolute;
+  min-width: 200px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: var(--md-elevation-2);
+  overflow: hidden;
+}
+
+/* Popover fixes */
+.popover-content {
+  z-index: var(--z-popover);
+  position: absolute;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: var(--md-elevation-3);
+  overflow: hidden;
+}
+
+/* Tooltip fixes */
+.tooltip-content {
+  z-index: var(--z-tooltip);
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
+/* Toast fixes */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Header fixes */
+.header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Ensure proper stacking context */
+.stacking-context {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* Fix for overlapping elements */
+.no-overlap {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* Responsive modal fixes */
+@media (max-width: 768px) {
+  .modal-content {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+  }
+  
+  .dropdown-content {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 16px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
 }
 
 /* Custom scrollbar */

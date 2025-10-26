@@ -455,6 +455,14 @@ export default function ContestEditorPage() {
     face: 0,
     voice: 0,
   })
+  const [dismissedWarnings, setDismissedWarnings] = useState({
+    face: false,
+    voice: false,
+  })
+  const [warningCooldowns, setWarningCooldowns] = useState({
+    face: 0,
+    voice: 0,
+  })
 
   // Load contest data
   useEffect(() => {
@@ -489,12 +497,22 @@ export default function ContestEditorPage() {
     
     contestMonitoring.startMonitoring({
       onFaceNotDetected: () => {
+        const now = Date.now()
+        if (dismissedWarnings.face && now - warningCooldowns.face < 15000) {
+          return // Still in cooldown period
+        }
         setViolations(prev => ({ ...prev, face: prev.face + 1 }))
         setShowFaceWarning(true)
+        setDismissedWarnings(prev => ({ ...prev, face: false }))
       },
       onVoiceDetected: () => {
+        const now = Date.now()
+        if (dismissedWarnings.voice && now - warningCooldowns.voice < 15000) {
+          return // Still in cooldown period
+        }
         setViolations(prev => ({ ...prev, voice: prev.voice + 1 }))
         setShowVoiceWarning(true)
+        setDismissedWarnings(prev => ({ ...prev, voice: false }))
       },
       onFullscreenExit: () => {
         setViolations(prev => ({ ...prev, fullscreen: prev.fullscreen + 1 }))
@@ -509,6 +527,19 @@ export default function ContestEditorPage() {
     if (success) {
       setShowFullscreenWarning(false)
     }
+  }
+
+  // Handle dismiss warnings with 15-second cooldown
+  const handleDismissFaceWarning = () => {
+    setShowFaceWarning(false)
+    setDismissedWarnings(prev => ({ ...prev, face: true }))
+    setWarningCooldowns(prev => ({ ...prev, face: Date.now() }))
+  }
+
+  const handleDismissVoiceWarning = () => {
+    setShowVoiceWarning(false)
+    setDismissedWarnings(prev => ({ ...prev, voice: true }))
+    setWarningCooldowns(prev => ({ ...prev, voice: Date.now() }))
   }
 
   // Update code template when language changes
@@ -764,13 +795,13 @@ int main() {
       <FaceDetectionWarningDialog
         isOpen={showFaceWarning}
         onClose={() => setShowFaceWarning(false)}
-        onDismiss={() => setShowFaceWarning(false)}
+        onDismiss={handleDismissFaceWarning}
       />
       
       <VoiceDetectionWarningDialog
         isOpen={showVoiceWarning}
         onClose={() => setShowVoiceWarning(false)}
-        onDismiss={() => setShowVoiceWarning(false)}
+        onDismiss={handleDismissVoiceWarning}
       />
 
       {/* Header */}

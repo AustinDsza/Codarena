@@ -295,26 +295,35 @@ export class ContestMonitoringService {
   }
 
   private playSoundAlert() {
-    if (typeof window === 'undefined' || !this.audioContext) return
+    if (typeof window === 'undefined') return
     
     try {
-      // Create a beep sound for fullscreen exit alert
-      const oscillator = this.audioContext.createOscillator()
-      const gainNode = this.audioContext.createGain()
-      
-      oscillator.connect(gainNode)
-      gainNode.connect(this.audioContext.destination)
+      // Create a new audio context for each alert to ensure it works
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
       
       // Create a more noticeable alert sound
-      oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime)
-      oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime + 0.1)
-      oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime + 0.2)
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
       
-      gainNode.gain.setValueAtTime(0.5, this.audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3)
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
       
-      oscillator.start(this.audioContext.currentTime)
-      oscillator.stop(this.audioContext.currentTime + 0.3)
+      // Create a distinctive beep pattern
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1)
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.3)
+      
+      gainNode.gain.setValueAtTime(0.7, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.4)
+      
+      // Close the audio context after playing
+      setTimeout(() => {
+        audioContext.close()
+      }, 500)
     } catch (error) {
       console.warn('Could not play sound alert:', error)
     }

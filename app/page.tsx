@@ -40,6 +40,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useWallet } from "@/lib/wallet-context"
+import { useAuth } from "@/lib/auth-context"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
 
@@ -1082,6 +1083,7 @@ function ContestRulesDialog({
 export default function CodarenaApp() {
   const [email, setEmail] = useState("")
   const { balance, deductAmount } = useWallet()
+  const { user, isAuthenticated, logout } = useAuth()
   const router = useRouter()
 
   const [selectedContestForPrize, setSelectedContestForPrize] = useState<any>(null)
@@ -1442,13 +1444,47 @@ export default function CodarenaApp() {
                 <User className="h-4 w-4" />
                 <span>Profile</span>
               </Link>
-              <Link
-                href="/wallet"
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-300 font-semibold"
-              >
-                <Coins className="h-4 w-4" />
-                <span>{formatCCAmount(balance)}</span>
-              </Link>
+              
+              {/* Authentication Section */}
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/wallet"
+                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-300 font-semibold"
+                  >
+                    <Coins className="h-4 w-4" />
+                    <span>{formatCCAmount(balance)}</span>
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">Welcome, {user?.name}</span>
+                    <MaterialButton
+                      variant="outlined"
+                      size="small"
+                      onClick={logout}
+                      className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                    >
+                      Logout
+                    </MaterialButton>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/login"
+                    className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
+                  >
+                    Sign In
+                  </Link>
+                  <Link href="/register">
+                    <MaterialButton
+                      size="small"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Sign Up
+                    </MaterialButton>
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Mobile Menu Button */}

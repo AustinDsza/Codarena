@@ -27,6 +27,7 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
+  Coins,
 } from "lucide-react"
 import Link from "next/link"
 import { useWallet } from "@/lib/wallet-context"
@@ -105,6 +106,10 @@ export default function WalletPage() {
     }).format(date)
   }
 
+  const formatCCAmount = (amount: number): string => {
+    return `${amount.toLocaleString("en-IN")} CC`
+  }
+
   const paymentMethods = [
     { id: "upi", name: "UPI", icon: Smartphone },
     { id: "card", name: "Credit/Debit Card", icon: CreditCard },
@@ -160,8 +165,9 @@ export default function WalletPage() {
                 <div>
                   <CardTitle className="text-white mb-2">Wallet Balance</CardTitle>
                   <div className="flex items-center gap-3">
-                    <div className="text-4xl font-bold">
-                      {showBalance ? `₹${balance.toLocaleString("en-IN")}` : "₹****"}
+                    <div className="text-4xl font-bold flex items-center gap-2">
+                      <Coins className="h-8 w-8" />
+                      {showBalance ? formatCCAmount(balance) : "**** CC"}
                     </div>
                     <Button
                       variant="ghost"
@@ -191,7 +197,10 @@ export default function WalletPage() {
                     <TrendingUp className="h-8 w-8 text-white" />
                     <div>
                       <p className="text-white/80 text-sm">This Month</p>
-                      <p className="text-xl font-bold">₹{Math.floor(Math.random() * 500) + 200}</p>
+                      <p className="text-xl font-bold flex items-center gap-1">
+                        <Coins className="h-4 w-4" />
+                        {formatCCAmount(Math.floor(Math.random() * 500) + 200)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -200,7 +209,10 @@ export default function WalletPage() {
                     <ArrowDownLeft className="h-8 w-8 text-white" />
                     <div>
                       <p className="text-white/80 text-sm">Total Spent</p>
-                      <p className="text-xl font-bold">₹{Math.floor(Math.random() * 1000) + 500}</p>
+                      <p className="text-xl font-bold flex items-center gap-1">
+                        <Coins className="h-4 w-4" />
+                        {formatCCAmount(Math.floor(Math.random() * 1000) + 500)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -209,7 +221,10 @@ export default function WalletPage() {
                     <ArrowUpRight className="h-8 w-8 text-white" />
                     <div>
                       <p className="text-white/80 text-sm">Total Added</p>
-                      <p className="text-xl font-bold">₹{Math.floor(Math.random() * 2000) + 1000}</p>
+                      <p className="text-xl font-bold flex items-center gap-1">
+                        <Coins className="h-4 w-4" />
+                        {formatCCAmount(Math.floor(Math.random() * 2000) + 1000)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -314,11 +329,12 @@ export default function WalletPage() {
                         <div className="flex items-center gap-3">
                           <div>
                             <p
-                              className={`text-lg font-bold ${
+                              className={`text-lg font-bold flex items-center gap-1 ${
                                 transaction.type === "credit" ? "text-green-600" : "text-red-600"
                               }`}
                             >
-                              {transaction.type === "credit" ? "+" : "-"}₹{transaction.amount}
+                              <Coins className="h-4 w-4" />
+                              {transaction.type === "credit" ? "+" : "-"}{formatCCAmount(transaction.amount)}
                             </p>
                             <Badge variant="secondary" className={getStatusColor(transaction.status)}>
                               <div className="flex items-center gap-1">
@@ -364,7 +380,7 @@ export default function WalletPage() {
                 min="1"
                 max="50000"
               />
-              <p className="text-sm text-gray-500 mt-1">Minimum: ₹1, Maximum: ₹50,000</p>
+              <p className="text-sm text-gray-500 mt-1">Minimum: 1 CC, Maximum: 50,000 CC</p>
             </div>
 
             <div>
@@ -420,15 +436,24 @@ export default function WalletPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-gray-700">
                     <span>Amount</span>
-                    <span className="font-medium">₹{addAmount}</span>
+                    <span className="font-medium flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      {formatCCAmount(Number(addAmount))}
+                    </span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Processing Fee</span>
-                    <span className="text-green-600 font-medium">₹0</span>
+                    <span className="text-green-600 font-medium flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      0 CC
+                    </span>
                   </div>
                   <div className="border-t border-gray-300 pt-2 flex justify-between font-semibold text-gray-900">
                     <span>Total</span>
-                    <span className="text-green-600">₹{addAmount}</span>
+                    <span className="text-green-600 flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      {formatCCAmount(Number(addAmount))}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -456,7 +481,7 @@ export default function WalletPage() {
                 ) : (
                   <>
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Add ₹{addAmount || "0"}
+                    Add {formatCCAmount(Number(addAmount) || 0)}
                   </>
                 )}
               </Button>

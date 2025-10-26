@@ -27,7 +27,7 @@ interface WalletContextType {
 const WalletContext = createContext<WalletContextType | undefined>(undefined)
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
-  const [balance, setBalance] = useState(1500) // Initial balance
+  const [balance, setBalance] = useState(1500) // Initial balance in Codarena Coins (CC)
   const [transactions, setTransactions] = useState<Transaction[]>([
     // Sample initial transactions
     {

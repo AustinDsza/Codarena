@@ -23,7 +23,7 @@ import {
   Gift,
   Brain,
   Heart,
-  IndianRupee,
+  Coins,
   Filter,
   Zap,
   Paintbrush,
@@ -43,7 +43,7 @@ import { useWallet } from "@/lib/wallet-context"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
 
-// Function to calculate dynamic prize pool
+// Function to calculate dynamic prize pool in Codarena Coins (CC)
 const calculateDynamicPrizePool = (participants: number, entryFee: number): number => {
   const totalCollected = participants * entryFee
   const platformCommission = totalCollected * 0.4 // 40% platform commission
@@ -51,7 +51,7 @@ const calculateDynamicPrizePool = (participants: number, entryFee: number): numb
   return Math.round(finalPrizePool)
 }
 
-// Function to get prize pool calculation details
+// Function to get prize pool calculation details in Codarena Coins (CC)
 const getPrizePoolDetails = (participants: number, entryFee: number) => {
   const totalCollected = participants * entryFee
   const platformCommission = totalCollected * 0.4
@@ -61,6 +61,11 @@ const getPrizePoolDetails = (participants: number, entryFee: number) => {
     platformCommission: Math.round(platformCommission),
     finalPrizePool: Math.round(finalPrizePool)
   }
+}
+
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
 }
 
 // Optimized contest data structure - only essential fields for immediate display
@@ -512,7 +517,10 @@ function PaymentConfirmationDialog({
               </div>
               <div className="border-t border-green-200 pt-2 flex justify-between">
                 <span className="text-green-900 font-medium">Total Amount:</span>
-                <span className="font-bold text-green-600">₹{contest.entryFee}</span>
+                <span className="font-bold text-green-600 flex items-center gap-1">
+                  <Coins className="h-4 w-4" />
+                  {formatCCAmount(contest.entryFee)}
+                </span>
               </div>
             </div>
           </MaterialCard>
@@ -525,7 +533,10 @@ function PaymentConfirmationDialog({
                 Prize Pool
               </h4>
               <div className="text-center">
-                <p className="md-headline-6 font-bold text-yellow-700">₹{calculateDynamicPrizePool(contest.participants, contest.entryFee).toLocaleString("en-IN")}</p>
+                <p className="md-headline-6 font-bold text-yellow-700 flex items-center gap-1">
+                  <Coins className="h-5 w-5" />
+                  {formatCCAmount(calculateDynamicPrizePool(contest.participants, contest.entryFee))}
+                </p>
                 <p className="text-xs text-yellow-600 mt-1">
                   {/*contest.prizeDistribution.reduce((sum: number, p: any) => sum + p.count, 0)*/} winners
                 </p>
@@ -594,7 +605,7 @@ function PrizeBreakdownDialog({
           </DialogTitle>
           <DialogDescription>
             {contest.prizeType === "cash"
-              ? `Total prize pool: ₹${calculateDynamicPrizePool(contest.participants, contest.entryFee).toLocaleString("en-IN")} • Entry fee: ₹${contest.entryFee}`
+              ? `Total prize pool: ${formatCCAmount(calculateDynamicPrizePool(contest.participants, contest.entryFee))} • Entry fee: ${formatCCAmount(contest.entryFee)}`
               : "Free practice contest with digital rewards"}
           </DialogDescription>
         </DialogHeader>
@@ -615,15 +626,24 @@ function PrizeBreakdownDialog({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Collected:</span>
-                    <span className="font-medium">₹{getPrizePoolDetails(contest.participants, contest.entryFee).totalCollected.toLocaleString("en-IN")}</span>
+                    <span className="font-medium flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      {formatCCAmount(getPrizePoolDetails(contest.participants, contest.entryFee).totalCollected)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Platform Commission (40%):</span>
-                    <span className="font-medium text-red-600">-₹{getPrizePoolDetails(contest.participants, contest.entryFee).platformCommission.toLocaleString("en-IN")}</span>
+                    <span className="font-medium text-red-600 flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      -{formatCCAmount(getPrizePoolDetails(contest.participants, contest.entryFee).platformCommission)}
+                    </span>
                   </div>
                   <div className="flex justify-between border-t pt-2">
                     <span className="font-semibold text-gray-900">Final Prize Pool:</span>
-                    <span className="font-bold text-green-600">₹{getPrizePoolDetails(contest.participants, contest.entryFee).finalPrizePool.toLocaleString("en-IN")}</span>
+                    <span className="font-bold text-green-600 flex items-center gap-1">
+                      <Coins className="h-3 w-3" />
+                      {formatCCAmount(getPrizePoolDetails(contest.participants, contest.entryFee).finalPrizePool)}
+                    </span>
                   </div>
                 </div>
               </MaterialCard>
@@ -652,7 +672,10 @@ function PrizeBreakdownDialog({
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="font-bold text-green-600">₹{prize.amount.toLocaleString("en-IN")}</span>
+                      <span className="font-bold text-green-600 flex items-center gap-1">
+                        <Coins className="h-3 w-3" />
+                        {formatCCAmount(prize.amount)}
+                      </span>
                       <div className="text-xs text-gray-500">{prize.percentage}% each</div>
                     </div>
                   </div>
@@ -1918,8 +1941,9 @@ export default function CodarenaApp() {
                                 <Trophy className="h-4 w-4 text-yellow-600" />
                                 <span className="text-sm font-medium text-gray-900">Prize Pool</span>
                               </div>
-                              <span className="text-lg font-bold text-green-600">
-                                ₹{calculateDynamicPrizePool(contest.participants, contest.entryFee).toLocaleString("en-IN")}
+                              <span className="text-lg font-bold text-green-600 flex items-center gap-1">
+                                <Coins className="h-4 w-4" />
+                                {formatCCAmount(calculateDynamicPrizePool(contest.participants, contest.entryFee))}
                               </span>
                             </div>
                           </div>
@@ -1947,7 +1971,7 @@ export default function CodarenaApp() {
                             )
                           }
                         >
-                          {contest.prizeType === "free" ? "Practice Now" : `₹${contest.entryFee}`}
+                          {contest.prizeType === "free" ? "Practice Now" : `${formatCCAmount(contest.entryFee)}`}
                         </MaterialButton>
 
                         {/* Secondary Actions */}

@@ -503,13 +503,16 @@ function PaymentConfirmationDialog({
           {/* Payment Details */}
           <MaterialCard elevation={1} className="p-4 bg-green-50">
             <h4 className="md-subtitle-1 font-medium text-green-900 mb-3 flex items-center gap-2">
-              <IndianRupee className="h-4 w-4" />
+              <Coins className="h-4 w-4" />
               Payment Details
             </h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-green-800">Entry Fee:</span>
-                <span className="font-bold text-green-900">₹{contest.entryFee}</span>
+                <span className="font-bold text-green-900 flex items-center gap-1">
+                  <Coins className="h-3 w-3" />
+                  {formatCCAmount(contest.entryFee)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-green-800">Payment Method:</span>
@@ -893,7 +896,7 @@ function InviteFriendsDialog({
               <div className="flex justify-between">
                 <span className="text-blue-700 font-medium">Entry:</span>
                 <span className="text-blue-900 font-semibold">
-                  {contest.prizeType === "cash" ? `₹${contest.entryFee}` : "Free Practice"}
+                  {contest.prizeType === "cash" ? formatCCAmount(contest.entryFee) : "Free Practice"}
                 </span>
               </div>
             </div>
@@ -1443,8 +1446,8 @@ export default function CodarenaApp() {
                 href="/wallet"
                 className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-300 font-semibold"
               >
-                <IndianRupee className="h-4 w-4" />
-                <span>{balance.toLocaleString("en-IN")}</span>
+                <Coins className="h-4 w-4" />
+                <span>{formatCCAmount(balance)}</span>
               </Link>
             </div>
 

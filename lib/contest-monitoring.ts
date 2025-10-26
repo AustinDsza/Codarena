@@ -390,4 +390,9 @@ export class ContestMonitoringService {
 }
 
 // Export singleton instance - only create on client side
-export const contestMonitoring = typeof window !== 'undefined' ? new ContestMonitoringService() : null as any
+export const contestMonitoring = typeof window !== 'undefined' ? new ContestMonitoringService() : {
+  requestPermissions: () => Promise.resolve(false),
+  startMonitoring: () => {},
+  stopMonitoring: () => {},
+  enterFullscreen: () => Promise.resolve(false),
+} as any

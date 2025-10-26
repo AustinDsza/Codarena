@@ -84,7 +84,7 @@ const contestEssentials = [
     prizeType: "cash",
     difficulty: "intermediate",
     duration: "45 minutes",
-    startTime: new Date(Date.now() - 5 * 60 * 1000), // Started 5 minutes ago
+    startTime: new Date("2024-01-15T10:00:00Z"), // Static start time for SSR compatibility
     tags: ["Lightning Round", "Quick", "High Stakes"],
     featured: true,
     isLive: true,
@@ -103,7 +103,7 @@ const contestEssentials = [
     prizeType: "free",
     difficulty: "beginner",
     duration: "1 hour",
-    startTime: new Date(Date.now() + 5 * 60 * 1000),
+    startTime: new Date("2024-01-15T11:00:00Z"), // Static start time for SSR compatibility
     tags: ["Practice", "Free", "Beginner Friendly"],
     featured: true,
     showTimer: true,
@@ -1092,7 +1092,7 @@ export default function CodarenaApp() {
   const [showLeaderboard, setShowLeaderboard] = useState(false)
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedPriceFilter, setSelectedPriceFilter] = useState<string>("all") // New price filter state
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
   const [isScrolling, setIsScrolling] = useState(false)
   const [showDisclaimer, setShowDisclaimer] = useState(true)
   const [showHowItWorks, setShowHowItWorks] = useState(true)
@@ -1125,14 +1125,21 @@ export default function CodarenaApp() {
   const [selectedContestForRules, setSelectedContestForRules] = useState<any>(null)
   const [showRulesDialog, setShowRulesDialog] = useState(false)
 
+  // Initialize current time on client side only
+  useEffect(() => {
+    setCurrentTime(new Date())
+  }, [])
+
   // Update current time every second for live timer (only for contests with showTimer)
   useEffect(() => {
+    if (!currentTime) return
+    
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [currentTime])
 
   const getContestTypeLabel = (type: string) => {
     switch (type) {
@@ -1214,6 +1221,8 @@ export default function CodarenaApp() {
   }
 
   const formatTimeUntilStart = (startTime: Date) => {
+    if (!currentTime) return { text: "Loading...", isUrgent: false, isStarted: false }
+    
     const diff = startTime.getTime() - currentTime.getTime()
 
     if (diff <= 0) return { text: "Started", isUrgent: false, isStarted: true }

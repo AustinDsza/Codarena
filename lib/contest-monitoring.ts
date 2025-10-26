@@ -15,6 +15,8 @@ export class ContestMonitoringService {
   private analyser: AnalyserNode | null = null
   private microphone: MediaStreamAudioSourceNode | null = null
   private dataArray: Uint8Array | null = null
+  private faceDisplayElement: HTMLVideoElement | null = null
+  private soundAlert: HTMLAudioElement | null = null
 
   // Callbacks for violations
   private onFaceNotDetected?: () => void
@@ -23,10 +25,18 @@ export class ContestMonitoringService {
   private onPermissionsGranted?: () => void
 
   constructor() {
-    this.setupVideoElement()
+    // Only setup video element on client side
+    if (typeof window !== 'undefined') {
+      this.setupVideoElement()
+      this.setupFaceDisplay()
+      this.setupSoundAlert()
+    }
   }
 
   private setupVideoElement() {
+    // Only create video element on client side
+    if (typeof window === 'undefined') return
+    
     // Create a hidden video element for face detection
     this.videoElement = document.createElement('video')
     this.videoElement.style.position = 'fixed'
@@ -37,6 +47,58 @@ export class ContestMonitoringService {
     this.videoElement.autoplay = true
     this.videoElement.muted = true
     document.body.appendChild(this.videoElement)
+  }
+
+  private setupFaceDisplay() {
+    // Only create face display on client side
+    if (typeof window === 'undefined') return
+    
+    // Create a visible video element for face display in corner
+    this.faceDisplayElement = document.createElement('video')
+    this.faceDisplayElement.style.position = 'fixed'
+    this.faceDisplayElement.style.top = '20px'
+    this.faceDisplayElement.style.right = '20px'
+    this.faceDisplayElement.style.width = '120px'
+    this.faceDisplayElement.style.height = '90px'
+    this.faceDisplayElement.style.border = '2px solid #3b82f6'
+    this.faceDisplayElement.style.borderRadius = '8px'
+    this.faceDisplayElement.style.backgroundColor = '#000'
+    this.faceDisplayElement.style.zIndex = '9999'
+    this.faceDisplayElement.style.display = 'none' // Hidden initially
+    this.faceDisplayElement.autoplay = true
+    this.faceDisplayElement.muted = true
+    document.body.appendChild(this.faceDisplayElement)
+  }
+
+  private setupSoundAlert() {
+    // Only create sound alert on client side
+    if (typeof window === 'undefined') return
+    
+    // Create audio element for fullscreen exit alert
+    this.soundAlert = document.createElement('audio')
+    this.soundAlert.preload = 'auto'
+    
+    // Create a simple beep sound using Web Audio API
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.5)
+      
+      // Store the audio context for reuse
+      this.audioContext = audioContext
+    } catch (error) {
+      console.warn('Could not create sound alert:', error)
+    }
   }
 
   async requestPermissions(): Promise<boolean> {
@@ -62,6 +124,13 @@ export class ContestMonitoringService {
       if (this.videoElement) {
         this.videoElement.srcObject = stream
         await this.videoElement.play()
+      }
+
+      // Setup face display
+      if (this.faceDisplayElement) {
+        this.faceDisplayElement.srcObject = stream
+        await this.faceDisplayElement.play()
+        this.faceDisplayElement.style.display = 'block'
       }
 
       // Setup audio analysis
@@ -219,9 +288,36 @@ export class ContestMonitoringService {
       )
 
       if (!isFullscreen) {
+        this.playSoundAlert()
         this.onFullscreenExit?.()
       }
     }, 500) // Check every 500ms
+  }
+
+  private playSoundAlert() {
+    if (typeof window === 'undefined' || !this.audioContext) return
+    
+    try {
+      // Create a beep sound for fullscreen exit alert
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+      
+      // Create a more noticeable alert sound
+      oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime)
+      oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime + 0.1)
+      oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime + 0.2)
+      
+      gainNode.gain.setValueAtTime(0.5, this.audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3)
+      
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.3)
+    } catch (error) {
+      console.warn('Could not play sound alert:', error)
+    }
   }
 
   stopMonitoring() {
@@ -264,6 +360,13 @@ export class ContestMonitoringService {
     if (this.videoElement) {
       document.body.removeChild(this.videoElement)
       this.videoElement = null
+    }
+
+    // Hide and remove face display element
+    if (this.faceDisplayElement) {
+      this.faceDisplayElement.style.display = 'none'
+      document.body.removeChild(this.faceDisplayElement)
+      this.faceDisplayElement = null
     }
   }
 

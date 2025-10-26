@@ -491,15 +491,15 @@ body {
 :root {
   /* Base layers */
   --z-base: 0;
-  --z-dropdown: 1000;
-  --z-sticky: 1010;
-  --z-fixed: 1020;
-  --z-modal-backdrop: 9998;
-  --z-modal: 9999;
-  --z-popover: 10001;
-  --z-tooltip: 10002;
-  --z-toast: 10003;
-  --z-maximum: 99999;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-tooltip: 70;
+  --z-toast: 80;
+  --z-maximum: 9999;
 }
 
 /* Floating Action Button */

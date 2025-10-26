@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -332,27 +332,6 @@ export default function CreateContestPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingMCQ, setEditingMCQ] = useState<MCQQuestion | null>(null)
   const [editingDSA, setEditingDSA] = useState<DSAQuestion | null>(null)
-
-  // Cleanup effect to prevent ghost UI
-  useEffect(() => {
-    return () => {
-      // Clean up any lingering state when component unmounts
-      setShowDemoModal(false)
-      setShowConfirmationModal(false)
-      setIsSubmitting(false)
-      setEditingMCQ(null)
-      setEditingDSA(null)
-    }
-  }, [])
-
-  // Reset form when switching steps to prevent ghost UI
-  useEffect(() => {
-    if (currentStep === 1) {
-      // Reset any editing states when going back to step 1
-      setEditingMCQ(null)
-      setEditingDSA(null)
-    }
-  }, [currentStep])
   const [editingDesign, setEditingDesign] = useState<DesignProblem | null>(null)
   const [showMCQForm, setShowMCQForm] = useState(false)
   const [showDSAForm, setShowDSAForm] = useState(false)
@@ -830,7 +809,7 @@ export default function CreateContestPage() {
 
       {/* Demo Mode Selection Modal */}
       <Dialog open={showDemoModal} onOpenChange={setShowDemoModal}>
-        <DialogContent className="max-w-4xl max-h-[95vh] flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[95vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Settings className="h-6 w-6 text-blue-500" />
@@ -1028,7 +1007,7 @@ export default function CreateContestPage() {
                 <div>
                   Start: {contestForm.startDate} at {contestForm.startTime}
                 </div>
-                {contestForm.prizeType === "cash" && <div>Entry Fee: {formatCCAmount(contestForm.entryFee)}</div>}
+                {contestForm.prizeType === "cash" && <div>Entry Fee: {formatCCAmount(Number(contestForm.entryFee))}</div>}
               </div>
             </div>
 
@@ -1119,7 +1098,7 @@ export default function CreateContestPage() {
           </div>
 
           {/* Step Content */}
-          <div className="bg-white rounded-xl shadow-lg">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             {/* Step 1: Contest Type */}
             {currentStep === 1 && (
               <div className="p-8 min-h-[600px] overflow-y-auto">
@@ -2375,7 +2354,7 @@ export default function CreateContestPage() {
                             <Label className="text-sm font-medium text-gray-600">Entry Fee</Label>
                             <p className="text-base flex items-center gap-1">
                               <Coins className="h-4 w-4" />
-                              {formatCCAmount(contestForm.entryFee)}
+                              {formatCCAmount(Number(contestForm.entryFee))}
                             </p>
                           </div>
                           <div>
@@ -2386,7 +2365,7 @@ export default function CreateContestPage() {
                             <Label className="text-sm font-medium text-gray-600">Prize Pool</Label>
                             <p className="text-base flex items-center gap-1">
                               <Coins className="h-4 w-4" />
-                              {formatCCAmount(contestForm.prizePool)}
+                              {formatCCAmount(Number(contestForm.prizePool))}
                             </p>
                           </div>
                         </div>

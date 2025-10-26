@@ -165,7 +165,7 @@ export default function ContestLobbyPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white md-elevation-2 sticky top-0 z-[var(--z-sticky)]">
+      <header className="bg-white md-elevation-2 sticky top-0 z-50">
         <div className="md-container">
           <nav className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-3">
@@ -174,7 +174,7 @@ export default function ContestLobbyPage() {
               </div>
               <span className="md-headline-6 text-gray-900">Codarena</span>
             </Link>
-            <MaterialBadge variant="primary" size="large" className="font-mono">
+            <MaterialBadge variant="primary" size="medium" className="font-mono">
               {code}
             </MaterialBadge>
           </nav>
@@ -326,7 +326,7 @@ export default function ContestLobbyPage() {
                 <div className="space-y-3">
                   <MaterialButton
                     fullWidth
-                    size="large"
+                    size="medium"
                     startIcon={<Play className="h-5 w-5" />}
                     className="bg-green-600 hover:bg-green-700"
                     disabled={timeUntilStart > 0}

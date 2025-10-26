@@ -1847,7 +1847,7 @@ export default function CodarenaApp() {
                                   </MaterialBadge>
                                 )}
                                 {contest.isLive && (
-                                  <MaterialBadge variant="destructive" size="small" className="animate-pulse">
+                                  <MaterialBadge variant="error" size="small" className="animate-pulse">
                                     <div className="flex items-center gap-1">
                                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                                       LIVE
@@ -1867,19 +1867,19 @@ export default function CodarenaApp() {
                               <p className="md-body-2 text-gray-600 mb-3">{contest.description}</p>
                               <div className="flex flex-wrap gap-2">
                                 <MaterialBadge
-                                  variant="outline"
+                                  variant="secondary"
                                   size="small"
                                   className={getCategoryColor(contest.category)}
                                 >
                                   {getCategoryLabel(contest.category)}
                                 </MaterialBadge>
-                                <MaterialBadge variant="outline" size="small" className={getTypeColor(contest.type)}>
+                                <MaterialBadge variant="secondary" size="small" className={getTypeColor(contest.type)}>
                                   {getContestTypeLabel(contest.type)}
                                 </MaterialBadge>
-                                <MaterialBadge variant="outline" size="small">
+                                <MaterialBadge variant="secondary" size="small">
                                   {contest.difficulty}
                                 </MaterialBadge>
-                                <MaterialBadge variant="outline" size="small">
+                                <MaterialBadge variant="secondary" size="small">
                                   {contest.duration}
                                 </MaterialBadge>
                               </div>

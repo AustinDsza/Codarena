@@ -27,7 +27,7 @@ export default function JoinContestPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white md-elevation-2 sticky top-0 z-[var(--z-sticky)]">
+      <header className="bg-white md-elevation-2 sticky top-0 z-50">
         <div className="md-container">
           <nav className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-3">

@@ -313,7 +313,7 @@ const PaymentConfirmationDialog = ({
                 isProcessing ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <IndianRupee className="h-4 w-4" />
+                  <Coins className="h-4 w-4" />
                 )
               }
             >
@@ -605,7 +605,7 @@ export default function ContestDetailsPage() {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      deductAmount(contest.entryFee)
+      deductAmount(contest.entryFee, "Contest entry fee", contest.title)
       setShowPaymentDialog(false)
 
       if (contest.type === "dsa") {

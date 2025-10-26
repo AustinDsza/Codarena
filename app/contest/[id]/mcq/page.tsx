@@ -454,7 +454,7 @@ export default function MCQPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-[var(--z-sticky)]">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
@@ -505,7 +505,7 @@ export default function MCQPage() {
                     return (
                       <MaterialButton
                         key={index}
-                        variant={currentQuestion === index ? "default" : "outlined"}
+                        variant={currentQuestion === index ? "contained" : "outlined"}
                         size="medium"
                         onClick={() => setCurrentQuestion(index)}
                         className={`justify-start ${
@@ -608,7 +608,7 @@ export default function MCQPage() {
                       {currentQ.category}
                     </MaterialBadge>
                     <MaterialBadge
-                      variant="default"
+                      variant="primary"
                       size="medium"
                       className={
                         currentQ.difficulty === "Easy"
@@ -714,7 +714,7 @@ export default function MCQPage() {
                   Congratulations! You have successfully completed all {mcqData.questions.length} questions in{" "}
                   {mcqData.contestTitle}
                 </p>
-                <MaterialBadge variant="default" size="large" className="mt-4 bg-green-100 text-green-800">
+                <MaterialBadge variant="default" size="medium" className="mt-4 bg-green-100 text-green-800">
                   ✓ All Questions Answered
                 </MaterialBadge>
               </div>
@@ -743,7 +743,7 @@ export default function MCQPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <MaterialButton
                   onClick={handleRetakeQuiz}
-                  size="large"
+                  size="medium"
                   className="bg-purple-600 hover:bg-purple-700"
                   startIcon={<RotateCcw className="h-5 w-5" />}
                 >
@@ -751,7 +751,7 @@ export default function MCQPage() {
                 </MaterialButton>
                 <MaterialButton
                   onClick={handleStartNewAttempt}
-                  size="large"
+                  size="medium"
                   variant="outlined"
                   className="border-purple-600 text-purple-600 hover:bg-purple-50"
                   startIcon={<Play className="h-5 w-5" />}
@@ -760,7 +760,7 @@ export default function MCQPage() {
                 </MaterialButton>
                 <MaterialButton
                   onClick={() => router.push("/")}
-                  size="large"
+                  size="medium"
                   variant="outlined"
                   className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
@@ -863,7 +863,7 @@ export default function MCQPage() {
                             {question.category}
                           </MaterialBadge>
                           <MaterialBadge
-                            variant="default"
+                            variant="primary"
                             size="small"
                             className={
                               question.difficulty === "Easy"

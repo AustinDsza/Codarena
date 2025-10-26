@@ -467,7 +467,7 @@ export default function ProfilePage() {
                 <div className="flex flex-col sm:items-end gap-2">
                   <MaterialBadge
                     variant="default"
-                    size="large"
+                    size="medium"
                     className={`${getRankColor(demoUser.rank)} bg-yellow-100`}
                   >
                     {getRankIcon(demoUser.rank)}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -332,6 +332,27 @@ export default function CreateContestPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingMCQ, setEditingMCQ] = useState<MCQQuestion | null>(null)
   const [editingDSA, setEditingDSA] = useState<DSAQuestion | null>(null)
+
+  // Cleanup effect to prevent ghost UI
+  useEffect(() => {
+    return () => {
+      // Clean up any lingering state when component unmounts
+      setShowDemoModal(false)
+      setShowConfirmationModal(false)
+      setIsSubmitting(false)
+      setEditingMCQ(null)
+      setEditingDSA(null)
+    }
+  }, [])
+
+  // Reset form when switching steps to prevent ghost UI
+  useEffect(() => {
+    if (currentStep === 1) {
+      // Reset any editing states when going back to step 1
+      setEditingMCQ(null)
+      setEditingDSA(null)
+    }
+  }, [currentStep])
   const [editingDesign, setEditingDesign] = useState<DesignProblem | null>(null)
   const [showMCQForm, setShowMCQForm] = useState(false)
   const [showDSAForm, setShowDSAForm] = useState(false)
@@ -809,7 +830,7 @@ export default function CreateContestPage() {
 
       {/* Demo Mode Selection Modal */}
       <Dialog open={showDemoModal} onOpenChange={setShowDemoModal}>
-        <DialogContent className="max-w-4xl max-h-[95vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[95vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <Settings className="h-6 w-6 text-blue-500" />
@@ -1098,7 +1119,7 @@ export default function CreateContestPage() {
           </div>
 
           {/* Step Content */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white rounded-xl shadow-lg">
             {/* Step 1: Contest Type */}
             {currentStep === 1 && (
               <div className="p-8 min-h-[600px] overflow-y-auto">

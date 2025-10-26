@@ -767,6 +767,11 @@ int main() {
   }
 
   const handleFinishContest = () => {
+    // Stop monitoring when contest finishes
+    if (isMonitoring) {
+      contestMonitoring.stopMonitoring()
+      setIsMonitoring(false)
+    }
     handleContestCompletion()
   }
 

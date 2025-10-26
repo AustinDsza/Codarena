@@ -43,7 +43,7 @@ export function FullscreenWarningDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[var(--z-modal)]">
+      <DialogContent className="max-w-md z-[var(--z-modal)] mx-auto my-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-red-600">
             <AlertCircle className="h-6 w-6" />
@@ -102,7 +102,7 @@ export function FaceDetectionWarningDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[calc(var(--z-modal)+1)]">
+      <DialogContent className="max-w-md z-[calc(var(--z-modal)+1)] mx-auto my-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-orange-600">
             <Camera className="h-6 w-6" />
@@ -160,7 +160,7 @@ export function VoiceDetectionWarningDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[calc(var(--z-modal)+2)]">
+      <DialogContent className="max-w-md z-[calc(var(--z-modal)+2)] mx-auto my-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-purple-600">
             <Mic className="h-6 w-6" />

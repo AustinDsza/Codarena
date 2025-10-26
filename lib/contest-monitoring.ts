@@ -126,7 +126,11 @@ export class ContestMonitoringService {
         await this.videoElement.play()
       }
 
-      // Setup face display
+      // Setup face display - ensure it's created if not exists
+      if (!this.faceDisplayElement) {
+        this.setupFaceDisplay()
+      }
+      
       if (this.faceDisplayElement) {
         this.faceDisplayElement.srcObject = stream
         await this.faceDisplayElement.play()
@@ -385,5 +389,5 @@ export class ContestMonitoringService {
   }
 }
 
-// Export singleton instance
-export const contestMonitoring = new ContestMonitoringService()
+// Export singleton instance - only create on client side
+export const contestMonitoring = typeof window !== 'undefined' ? new ContestMonitoringService() : null as any

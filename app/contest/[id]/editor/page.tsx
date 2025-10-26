@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { MaterialButton } from "@/components/ui/material-button"
 import { MaterialCard } from "@/components/ui/material-card"
 import { MaterialBadge } from "@/components/ui/material-badge"
@@ -464,6 +464,10 @@ export default function ContestEditorPage() {
     voice: 0,
   })
 
+  // Use refs for cooldown tracking to avoid async state issues
+  const faceCooldownRef = useRef(0)
+  const voiceCooldownRef = useRef(0)
+
   // Load contest data
   useEffect(() => {
     const contestData = getContestById(contestId)
@@ -498,21 +502,19 @@ export default function ContestEditorPage() {
     contestMonitoring.startMonitoring({
       onFaceNotDetected: () => {
         const now = Date.now()
-        if (dismissedWarnings.face && now - warningCooldowns.face < 15000) {
+        if (faceCooldownRef.current > 0 && now - faceCooldownRef.current < 15000) {
           return // Still in cooldown period
         }
         setViolations(prev => ({ ...prev, face: prev.face + 1 }))
         setShowFaceWarning(true)
-        setDismissedWarnings(prev => ({ ...prev, face: false }))
       },
       onVoiceDetected: () => {
         const now = Date.now()
-        if (dismissedWarnings.voice && now - warningCooldowns.voice < 15000) {
+        if (voiceCooldownRef.current > 0 && now - voiceCooldownRef.current < 15000) {
           return // Still in cooldown period
         }
         setViolations(prev => ({ ...prev, voice: prev.voice + 1 }))
         setShowVoiceWarning(true)
-        setDismissedWarnings(prev => ({ ...prev, voice: false }))
       },
       onFullscreenExit: () => {
         setViolations(prev => ({ ...prev, fullscreen: prev.fullscreen + 1 }))
@@ -532,12 +534,14 @@ export default function ContestEditorPage() {
   // Handle dismiss warnings with 15-second cooldown
   const handleDismissFaceWarning = () => {
     setShowFaceWarning(false)
+    faceCooldownRef.current = Date.now()
     setDismissedWarnings(prev => ({ ...prev, face: true }))
     setWarningCooldowns(prev => ({ ...prev, face: Date.now() }))
   }
 
   const handleDismissVoiceWarning = () => {
     setShowVoiceWarning(false)
+    voiceCooldownRef.current = Date.now()
     setDismissedWarnings(prev => ({ ...prev, voice: true }))
     setWarningCooldowns(prev => ({ ...prev, voice: Date.now() }))
   }

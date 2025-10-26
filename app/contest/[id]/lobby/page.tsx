@@ -38,11 +38,13 @@ import {
   Monitor,
   Mic,
   Coins,
+  Maximize2,
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useWallet } from "@/lib/wallet-context"
+import { contestMonitoring } from "@/lib/contest-monitoring"
 
 // Mock contest data - in real app, this would come from API
 const getContestById = (id: string) => {
@@ -781,6 +783,17 @@ function PermissionRequestDialog({
             </div>
           </MaterialCard>
 
+          {/* Fullscreen Notice */}
+          <MaterialCard elevation={1} className="p-4 bg-blue-50">
+            <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+              <Maximize2 className="h-4 w-4" />
+              Fullscreen Mode Required
+            </h4>
+            <div className="text-sm text-blue-800">
+              <p>The contest will automatically enter fullscreen mode. Exiting fullscreen before submission will result in warnings and potential disqualification.</p>
+            </div>
+          </MaterialCard>
+
           {/* Action Buttons */}
           <div className="flex gap-3">
             <MaterialButton variant="outlined" onClick={onClose} className="flex-1" disabled={isRequesting}>
@@ -1108,17 +1121,15 @@ export default function ContestLobbyPage() {
     setIsRequestingPermissions(true)
 
     try {
-      // Request camera permission for DSA and Logic contests
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      })
+      // Request permissions using the monitoring service
+      const permissionsGranted = await contestMonitoring.requestPermissions()
 
-      // Stop the stream immediately after getting permission
-      stream.getTracks().forEach((track) => track.stop())
+      if (!permissionsGranted) {
+        throw new Error("Permissions denied")
+      }
 
       // Simulate additional permission checks
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       setShowPermissionDialog(false)
 

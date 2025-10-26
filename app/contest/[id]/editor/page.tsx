@@ -25,6 +25,13 @@ import {
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { contestMonitoring } from "@/lib/contest-monitoring"
+import {
+  FullscreenWarningDialog,
+  FaceDetectionWarningDialog,
+  VoiceDetectionWarningDialog,
+  MonitoringStatus,
+} from "./components/MonitoringComponents"
 
 // Mock contest data - in real app, this would come from API
 const getContestById = (id: string) => {
@@ -438,6 +445,17 @@ export default function ContestEditorPage() {
   const [codeOutput, setCodeOutput] = useState("Ready to run your code...")
   const [executionHistory, setExecutionHistory] = useState<any[]>([])
 
+  // Monitoring state
+  const [isMonitoring, setIsMonitoring] = useState(false)
+  const [showFullscreenWarning, setShowFullscreenWarning] = useState(false)
+  const [showFaceWarning, setShowFaceWarning] = useState(false)
+  const [showVoiceWarning, setShowVoiceWarning] = useState(false)
+  const [violations, setViolations] = useState({
+    fullscreen: 0,
+    face: 0,
+    voice: 0,
+  })
+
   // Load contest data
   useEffect(() => {
     const contestData = getContestById(contestId)
@@ -450,7 +468,48 @@ export default function ContestEditorPage() {
     } else {
       setCode(getCodeTemplate(language))
     }
+
+    // Start monitoring for DSA contests
+    if (contestData?.type === "dsa") {
+      startMonitoring()
+    }
+
+    // Cleanup monitoring on unmount
+    return () => {
+      if (isMonitoring) {
+        contestMonitoring.stopMonitoring()
+        setIsMonitoring(false)
+      }
+    }
   }, [contestId, currentProblem])
+
+  // Start monitoring system
+  const startMonitoring = () => {
+    setIsMonitoring(true)
+    
+    contestMonitoring.startMonitoring({
+      onFaceNotDetected: () => {
+        setViolations(prev => ({ ...prev, face: prev.face + 1 }))
+        setShowFaceWarning(true)
+      },
+      onVoiceDetected: () => {
+        setViolations(prev => ({ ...prev, voice: prev.voice + 1 }))
+        setShowVoiceWarning(true)
+      },
+      onFullscreenExit: () => {
+        setViolations(prev => ({ ...prev, fullscreen: prev.fullscreen + 1 }))
+        setShowFullscreenWarning(true)
+      },
+    })
+  }
+
+  // Handle fullscreen re-entry
+  const handleReenterFullscreen = async () => {
+    const success = await contestMonitoring.enterFullscreen()
+    if (success) {
+      setShowFullscreenWarning(false)
+    }
+  }
 
   // Update code template when language changes
   useEffect(() => {
@@ -692,6 +751,28 @@ int main() {
 
   return (
     <div className={`${isFullscreen ? "fixed inset-0 z-50" : "min-h-screen"} bg-gray-50`}>
+      {/* Monitoring Status */}
+      <MonitoringStatus isMonitoring={isMonitoring} violations={violations} />
+
+      {/* Warning Dialogs */}
+      <FullscreenWarningDialog
+        isOpen={showFullscreenWarning}
+        onClose={() => setShowFullscreenWarning(false)}
+        onReenterFullscreen={handleReenterFullscreen}
+      />
+      
+      <FaceDetectionWarningDialog
+        isOpen={showFaceWarning}
+        onClose={() => setShowFaceWarning(false)}
+        onDismiss={() => setShowFaceWarning(false)}
+      />
+      
+      <VoiceDetectionWarningDialog
+        isOpen={showVoiceWarning}
+        onClose={() => setShowVoiceWarning(false)}
+        onDismiss={() => setShowVoiceWarning(false)}
+      />
+
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

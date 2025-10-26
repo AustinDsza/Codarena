@@ -186,7 +186,7 @@ export default function LoginPage() {
             <MaterialButton
               type="submit"
               fullWidth
-              size="large"
+              size="medium"
               disabled={isLoading}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
               startIcon={
@@ -206,7 +206,7 @@ export default function LoginPage() {
               onClick={handleDemoLogin}
               variant="outlined"
               fullWidth
-              size="large"
+              size="medium"
               disabled={isLoading}
               className="border-green-300 text-green-700 hover:bg-green-50 font-semibold py-3"
               startIcon={<CheckCircle className="h-4 w-4" />}

@@ -53,9 +53,15 @@ import {
   CreditCard,
   Send,
   X,
+  Coins,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
 
 interface MCQQuestion {
   id: string
@@ -889,7 +895,7 @@ export default function CreateContestPage() {
                       <div className="bg-green-50 rounded-lg p-3">
                         <h4 className="font-medium text-green-700 mb-2">Subscription Model:</h4>
                         <ul className="text-sm text-green-600 space-y-1">
-                          <li>• ₹999/month subscription</li>
+                          <li>• 999 CC/month subscription</li>
                           <li>• 0% commission on contests</li>
                           <li>• Keep 100% of entry fees</li>
                           <li>• Unlimited contest creation</li>
@@ -926,7 +932,7 @@ export default function CreateContestPage() {
                   <div className="bg-white rounded-lg p-3 border border-yellow-200">
                     <h5 className="font-medium text-yellow-900 mb-2">Organization</h5>
                     <ul className="text-yellow-700 space-y-1">
-                      <li>• ₹999/month subscription</li>
+                      <li>• 999 CC/month subscription</li>
                       <li>• 0% commission</li>
                       <li>• All premium features</li>
                     </ul>
@@ -1001,7 +1007,7 @@ export default function CreateContestPage() {
                 <div>
                   Start: {contestForm.startDate} at {contestForm.startTime}
                 </div>
-                {contestForm.prizeType === "cash" && <div>Entry Fee: ₹{contestForm.entryFee}</div>}
+                {contestForm.prizeType === "cash" && <div>Entry Fee: {formatCCAmount(contestForm.entryFee)}</div>}
               </div>
             </div>
 
@@ -1538,13 +1544,19 @@ export default function CreateContestPage() {
                                   <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                       <span>Total Entry Fees Collected:</span>
-                                      <span className="font-medium">₹{totalCollected.toLocaleString()}</span>
+                                      <span className="font-medium flex items-center gap-1">
+                                        <Coins className="h-3 w-3" />
+                                        {formatCCAmount(totalCollected)}
+                                      </span>
                                     </div>
                                     {showPrizeCalculator && (
                                       <>
                                         <div className="flex justify-between text-sm text-red-600">
                                           <span>Platform Fee ({userTier === "regular" ? "5%" : "0%"}):</span>
-                                          <span>-₹{platformFee.toLocaleString()}</span>
+                                          <span className="flex items-center gap-1">
+                                            <Coins className="h-3 w-3" />
+                                            -{formatCCAmount(platformFee)}
+                                          </span>
                                         </div>
                                         {userTier === "regular" && demoMode && (
                                           <p className="text-xs text-red-500">
@@ -1553,14 +1565,17 @@ export default function CreateContestPage() {
                                         )}
                                         {userTier === "verified" && (
                                           <p className="text-xs text-green-600">
-                                            Verified creators keep 100% of entry fees (₹999/month subscription)
+                                            Verified creators keep 100% of entry fees (999 CC/month subscription)
                                           </p>
                                         )}
                                       </>
                                     )}
                                     <div className="flex justify-between text-base font-medium text-green-700 border-t pt-2">
                                       <span>Final Prize Pool:</span>
-                                      <span>₹{prizePool.toLocaleString()}</span>
+                                      <span className="flex items-center gap-1">
+                                        <Coins className="h-3 w-3" />
+                                        {formatCCAmount(prizePool)}
+                                      </span>
                                     </div>
                                   </div>
                                 )
@@ -1609,7 +1624,10 @@ export default function CreateContestPage() {
                                         )}
                                       </span>
                                       <span className="font-medium">
-                                        ₹{prize.amount.toLocaleString()} ({prize.percentage}%)
+                                        <span className="flex items-center gap-1">
+                                          <Coins className="h-3 w-3" />
+                                          {formatCCAmount(prize.amount)} ({prize.percentage}%)
+                                        </span>
                                       </span>
                                     </div>
                                   ))}
@@ -2334,7 +2352,10 @@ export default function CreateContestPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                           <div>
                             <Label className="text-sm font-medium text-gray-600">Entry Fee</Label>
-                            <p className="text-base">₹{contestForm.entryFee}</p>
+                            <p className="text-base flex items-center gap-1">
+                              <Coins className="h-4 w-4" />
+                              {formatCCAmount(contestForm.entryFee)}
+                            </p>
                           </div>
                           <div>
                             <Label className="text-sm font-medium text-gray-600">Max Participants</Label>
@@ -2342,7 +2363,10 @@ export default function CreateContestPage() {
                           </div>
                           <div>
                             <Label className="text-sm font-medium text-gray-600">Prize Pool</Label>
-                            <p className="text-base">₹{contestForm.prizePool}</p>
+                            <p className="text-base flex items-center gap-1">
+                              <Coins className="h-4 w-4" />
+                              {formatCCAmount(contestForm.prizePool)}
+                            </p>
                           </div>
                         </div>
                         {contestForm.prizeDistribution.length > 0 && (
@@ -2355,7 +2379,10 @@ export default function CreateContestPage() {
                                   className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded"
                                 >
                                   <span>{prize.position}</span>
-                                  <span className="font-medium">₹{prize.amount.toLocaleString()}</span>
+                                  <span className="font-medium flex items-center gap-1">
+                                    <Coins className="h-3 w-3" />
+                                    {formatCCAmount(prize.amount)}
+                                  </span>
                                 </div>
                               ))}
                             </div>

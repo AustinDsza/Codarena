@@ -4,8 +4,13 @@ import { useState } from "react"
 import { MaterialButton } from "@/components/ui/material-button"
 import { MaterialCard } from "@/components/ui/material-card"
 import { MaterialInput } from "@/components/ui/material-input"
-import { Share2, CheckCircle, Copy } from "lucide-react"
+import { Share2, CheckCircle, Copy, Coins } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
 
 export default function InviteFriendsDialog({
   contest,
@@ -63,7 +68,7 @@ export default function InviteFriendsDialog({
               <p className="text-blue-800">Duration: {contest.duration}</p>
               <p className="text-blue-800">Difficulty: {contest.difficulty}</p>
               <p className="text-blue-800">
-                {contest.prizeType === "cash" ? `Entry Fee: ₹${contest.entryFee}` : "Free Practice"}
+                {contest.prizeType === "cash" ? `Entry Fee: ${formatCCAmount(contest.entryFee)}` : "Free Practice"}
               </p>
             </div>
           </MaterialCard>

@@ -40,8 +40,14 @@ import {
   AlertTriangle,
   Info,
   Sparkles,
+  Coins,
 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
+
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
 
 // Mock contest results data
 const getContestResults = (contestId: string, sessionData?: any) => {
@@ -62,7 +68,7 @@ const getContestResults = (contestId: string, sessionData?: any) => {
         hasWon: false,
         message: "Great effort! You were close to the prize zone.",
         encouragement: "Keep practicing and you'll be in the top 3 next time!",
-        nextContestInfo: "Join our next Lightning DSA Challenge for another chance to win up to ₹950!",
+        nextContestInfo: "Join our next Lightning DSA Challenge for another chance to win up to 950 CC!",
         missedBy: 2, // positions away from prize zone
       },
     },
@@ -991,7 +997,7 @@ function ShareModal({ isOpen, onClose, results }: { isOpen: boolean; onClose: ()
 
   const shareUrl = `${window.location.origin}/contest/${results.contestId}/results`
   const shareText = results.prizeDetails?.hasWon
-    ? `🎉 I just won ₹${results.prizeDetails.prizeAmount?.toLocaleString("en-IN")} in "${results.contestTitle}"! Ranked #${results.userRank} out of ${results.totalParticipants} participants. 🏆`
+    ? `🎉 I just won ${formatCCAmount(results.prizeDetails.prizeAmount)} in "${results.contestTitle}"! Ranked #${results.userRank} out of ${results.totalParticipants} participants. 🏆`
     : `I just completed "${results.contestTitle}" and scored ${results.totalScore}/${results.maxScore} points! Ranked #${results.userRank} out of ${results.totalParticipants} participants. 🎯`
 
   const copyToClipboard = () => {
@@ -1405,7 +1411,10 @@ Generated on: ${new Date().toLocaleString()}
                   <div className="bg-white rounded-lg p-6 border-2 border-yellow-200 mb-4">
                     <div className="text-3xl font-bold text-yellow-600 mb-2">{results.prizeDetails.prizeName}</div>
                     <div className="text-4xl font-bold text-green-600 mb-2">
-                      ₹{results.prizeDetails.prizeAmount?.toLocaleString("en-IN")}
+                      <span className="text-2xl font-bold text-green-600 flex items-center gap-2">
+                        <Coins className="h-6 w-6" />
+                        {formatCCAmount(results.prizeDetails.prizeAmount)}
+                      </span>
                     </div>
                     <p className="text-gray-700 mb-3">{results.prizeDetails.prizeDescription}</p>
 
@@ -1590,7 +1599,10 @@ Generated on: ${new Date().toLocaleString()}
                   <div className="text-right">
                     <div className="font-bold text-lg text-green-600">{participant.score} pts</div>
                     {participant.prize > 0 && (
-                      <div className="text-sm text-yellow-600">₹{participant.prize.toLocaleString("en-IN")}</div>
+                      <div className="text-sm text-yellow-600 flex items-center gap-1">
+                        <Coins className="h-3 w-3" />
+                        {formatCCAmount(participant.prize)}
+                      </div>
                     )}
                   </div>
                 </div>

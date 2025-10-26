@@ -23,9 +23,15 @@ import {
   Gift,
   TrendingUp,
   Star,
+  Coins,
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
+
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
 
 // Mock MCQ data
 const getMCQData = (contestId: string) => {
@@ -770,7 +776,7 @@ export default function MCQPage() {
                   <div className="text-6xl mb-4">{winnings.icon}</div>
                   <h2 className={`text-2xl font-bold mb-4 ${winnings.color}`}>
                     {winnings.amount > 0
-                      ? `Congratulations! You Won ₹${winnings.amount.toLocaleString()}!`
+                      ? `Congratulations! You Won ${formatCCAmount(winnings.amount)}!`
                       : "Keep Going Strong!"}
                   </h2>
                   <p className={`text-lg mb-6 ${winnings.color}`}>{winnings.message}</p>
@@ -784,7 +790,10 @@ export default function MCQPage() {
                       <div className="flex items-center gap-2">
                         <Gift className={`h-5 w-5 ${winnings.color}`} />
                         <span className={`font-semibold ${winnings.color}`}>
-                          Prize: ₹{winnings.amount.toLocaleString()}
+                          Prize: <span className="flex items-center gap-1">
+                            <Coins className="h-3 w-3" />
+                            {formatCCAmount(winnings.amount)}
+                          </span>
                         </span>
                       </div>
                     </div>

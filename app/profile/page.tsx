@@ -30,7 +30,13 @@ import {
   Users2,
   Eye,
   ArrowLeft,
+  Coins,
 } from "lucide-react"
+
+// Function to format Codarena Coins amount
+const formatCCAmount = (amount: number): string => {
+  return `${amount.toLocaleString("en-IN")} CC`
+}
 
 // Demo user data
 const demoUser = {
@@ -531,7 +537,10 @@ export default function ProfilePage() {
             <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg mx-auto mb-4">
               <Gift className="h-6 w-6 text-green-600" />
             </div>
-            <div className="text-2xl font-bold text-green-600">₹{demoUser.totalEarnings.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-green-600 flex items-center gap-2">
+              <Coins className="h-6 w-6" />
+              {formatCCAmount(demoUser.totalEarnings)}
+            </div>
             <div className="text-sm text-gray-600">Total Earnings</div>
           </MaterialCard>
         </div>

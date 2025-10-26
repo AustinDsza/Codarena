@@ -865,7 +865,7 @@ function InviteFriendsDialog({
               <p className="text-blue-800">Duration: {contest.duration}</p>
               <p className="text-blue-800">Difficulty: {contest.difficulty}</p>
               <p className="text-blue-800">
-                {contest.prizeType === "cash" ? `Entry Fee: ₹${contest.entryFee}` : "Free Practice"}
+                {contest.prizeType === "cash" ? `Entry Fee: ${formatCCAmount(contest.entryFee)}` : "Free Practice"}
               </p>
             </div>
           </MaterialCard>
@@ -1437,7 +1437,7 @@ export default function ContestLobbyPage() {
                 </div>
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
                   <div className="text-2xl font-bold text-purple-600">
-                    {contest.prizeType === "cash" ? `₹${contest.prizePool.toLocaleString("en-IN")}` : "FREE"}
+                    {contest.prizeType === "cash" ? formatCCAmount(contest.prizePool) : "FREE"}
                   </div>
                   <div className="text-sm text-purple-800">Prize Pool</div>
                 </div>
@@ -1792,7 +1792,10 @@ export default function ContestLobbyPage() {
                         {index === 2 && <Award className="h-4 w-4 text-amber-600" />}
                         <span className="font-medium text-gray-900">{prize.position}</span>
                       </div>
-                      <span className="font-bold text-green-600">₹{prize.amount.toLocaleString("en-IN")}</span>
+                      <span className="font-bold text-green-600 flex items-center gap-1">
+                        <Coins className="h-3 w-3" />
+                        {formatCCAmount(prize.amount)}
+                      </span>
                     </div>
                   ))}
                 </div>

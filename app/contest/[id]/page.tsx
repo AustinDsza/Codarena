@@ -282,12 +282,16 @@ const PaymentConfirmationDialog = ({
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-blue-800">Entry Fee:</span>
-                <span className="font-medium text-blue-900">₹{contest.entryFee}</span>
+                <span className="font-medium text-blue-900 flex items-center gap-1">
+                  <Coins className="h-3 w-3" />
+                  {formatCCAmount(contest.entryFee)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-blue-800">Prize Pool:</span>
-                <span className="font-medium text-green-600">
-                  {contest.prizePool !== undefined ? `₹${contest.prizePool.toLocaleString("en-IN")}` : "N/A"}
+                <span className="font-medium text-green-600 flex items-center gap-1">
+                  <Coins className="h-3 w-3" />
+                  {contest.prizePool !== undefined ? formatCCAmount(contest.prizePool) : "N/A"}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -769,7 +773,7 @@ export default function ContestDetailsPage() {
                 </div>
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
                   <div className="text-2xl font-bold text-purple-600">
-                    {contest.prizeType === "cash" ? `₹${contest.prizePool.toLocaleString("en-IN")}` : "FREE"}
+                    {contest.prizeType === "cash" ? formatCCAmount(contest.prizePool) : "FREE"}
                   </div>
                   <div className="text-sm text-purple-800">Prize Pool</div>
                 </div>
@@ -856,7 +860,7 @@ export default function ContestDetailsPage() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to Start?</h3>
                 <p className="text-sm text-gray-600 mb-4">
                   {contest.prizeType === "cash"
-                    ? `Entry fee: ₹${contest.entryFee}`
+                    ? `Entry fee: ${formatCCAmount(contest.entryFee)}`
                     : "Free practice contest - no entry fee required!"}
                 </p>
                 <MaterialButton
@@ -925,7 +929,10 @@ export default function ContestDetailsPage() {
                           {index === 2 && <Award className="h-4 w-4 text-amber-600" />}
                           <span className="font-medium text-gray-900">{prize.position}</span>
                         </div>
-                        <span className="font-bold text-green-600">₹{prize.amount.toLocaleString("en-IN")}</span>
+                        <span className="font-bold text-green-600 flex items-center gap-1">
+                          <Coins className="h-3 w-3" />
+                          {formatCCAmount(prize.amount)}
+                        </span>
                       </div>
                     ))}
                   </div>

@@ -18,6 +18,7 @@ export class ContestMonitoringService {
   private faceDisplayElement: HTMLVideoElement | null = null
   private soundAlert: HTMLAudioElement | null = null
   private fullscreenChangeHandler: (() => void) | null = null
+  private monitoringStartTime: number = 0
 
   // Callbacks for violations
   private onFaceNotDetected?: () => void
@@ -240,6 +241,7 @@ export class ContestMonitoringService {
     this.onFullscreenExit = callbacks.onFullscreenExit
 
     this.isMonitoring = true
+    this.monitoringStartTime = Date.now() // Record when monitoring started
 
     // Ensure facecam is visible and working during monitoring
     if (this.faceDisplayElement && this.videoStream) {
@@ -270,6 +272,12 @@ export class ContestMonitoringService {
 
     this.faceDetectionInterval = setInterval(() => {
       if (!this.isMonitoring) return
+
+      // Don't show face detection warnings for the first 30 seconds
+      const timeSinceStart = Date.now() - this.monitoringStartTime
+      if (timeSinceStart < 30000) { // 30 seconds grace period
+        return
+      }
 
       // Simple face detection using canvas analysis
       const canvas = document.createElement('canvas')
@@ -321,6 +329,12 @@ export class ContestMonitoringService {
 
     this.voiceDetectionInterval = setInterval(() => {
       if (!this.isMonitoring) return
+
+      // Don't show voice detection warnings for the first 30 seconds
+      const timeSinceStart = Date.now() - this.monitoringStartTime
+      if (timeSinceStart < 30000) { // 30 seconds grace period
+        return
+      }
 
       this.analyser!.getByteFrequencyData(this.dataArray!)
 

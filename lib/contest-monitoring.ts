@@ -68,7 +68,24 @@ export class ContestMonitoringService {
     this.faceDisplayElement.style.display = 'none' // Hidden initially
     this.faceDisplayElement.autoplay = true
     this.faceDisplayElement.muted = true
+    this.faceDisplayElement.playsInline = true // Important for mobile compatibility
+    this.faceDisplayElement.controls = false
+    
+    // Add event listeners for debugging
+    this.faceDisplayElement.addEventListener('loadedmetadata', () => {
+      console.log('Face display metadata loaded')
+    })
+    
+    this.faceDisplayElement.addEventListener('canplay', () => {
+      console.log('Face display can play')
+    })
+    
+    this.faceDisplayElement.addEventListener('error', (e) => {
+      console.error('Face display video error:', e)
+    })
+    
     document.body.appendChild(this.faceDisplayElement)
+    console.log('Face display element created and added to DOM')
   }
 
   private setupSoundAlert() {
@@ -104,6 +121,8 @@ export class ContestMonitoringService {
 
   async requestPermissions(): Promise<boolean> {
     try {
+      console.log('Requesting camera and microphone permissions...')
+      
       // Request camera and microphone permissions
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -118,6 +137,10 @@ export class ContestMonitoringService {
         }
       })
 
+      console.log('Permissions granted, stream received:', stream)
+      console.log('Video tracks:', stream.getVideoTracks())
+      console.log('Audio tracks:', stream.getAudioTracks())
+
       this.videoStream = stream
       this.audioStream = stream
 
@@ -125,6 +148,7 @@ export class ContestMonitoringService {
       if (this.videoElement) {
         this.videoElement.srcObject = stream
         await this.videoElement.play()
+        console.log('Hidden video element setup complete')
       }
 
       // Setup face display - ensure it's created if not exists
@@ -133,9 +157,28 @@ export class ContestMonitoringService {
       }
       
       if (this.faceDisplayElement) {
+        console.log('Setting up face display with stream:', stream)
         this.faceDisplayElement.srcObject = stream
-        await this.faceDisplayElement.play()
         this.faceDisplayElement.style.display = 'block'
+        
+        // Ensure the video plays
+        try {
+          await this.faceDisplayElement.play()
+          console.log('Face display video started playing')
+        } catch (playError) {
+          console.error('Failed to play face display video:', playError)
+          // Try to play again after a short delay
+          setTimeout(async () => {
+            try {
+              await this.faceDisplayElement!.play()
+              console.log('Face display video started playing (retry)')
+            } catch (retryError) {
+              console.error('Failed to play face display video (retry):', retryError)
+            }
+          }, 100)
+        }
+      } else {
+        console.error('Face display element not created')
       }
 
       // Setup audio analysis
@@ -198,9 +241,18 @@ export class ContestMonitoringService {
 
     this.isMonitoring = true
 
-    // Ensure facecam is visible during monitoring
-    if (this.faceDisplayElement) {
+    // Ensure facecam is visible and working during monitoring
+    if (this.faceDisplayElement && this.videoStream) {
+      console.log('Ensuring facecam is visible during monitoring')
       this.faceDisplayElement.style.display = 'block'
+      
+      // Reconnect the stream if needed
+      if (!this.faceDisplayElement.srcObject) {
+        this.faceDisplayElement.srcObject = this.videoStream
+        this.faceDisplayElement.play().catch(e => {
+          console.error('Failed to play facecam during monitoring:', e)
+        })
+      }
     }
 
     // Start face detection

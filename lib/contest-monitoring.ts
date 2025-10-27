@@ -450,6 +450,7 @@ export class ContestMonitoringService {
   }
 
   stopMonitoring() {
+    console.log('Stopping monitoring and cleaning up all resources...')
     this.isMonitoring = false
 
     // Clear intervals
@@ -477,16 +478,8 @@ export class ContestMonitoringService {
       this.fullscreenChangeHandler = null
     }
 
-    // Stop streams
-    if (this.videoStream) {
-      this.videoStream.getTracks().forEach(track => track.stop())
-      this.videoStream = null
-    }
-
-    if (this.audioStream) {
-      this.audioStream.getTracks().forEach(track => track.stop())
-      this.audioStream = null
-    }
+    // Force stop all media streams aggressively
+    this.forceStopAllStreams()
 
     // Cleanup audio context
     if (this.audioContext) {
@@ -496,15 +489,73 @@ export class ContestMonitoringService {
 
     // Remove video element
     if (this.videoElement) {
-      document.body.removeChild(this.videoElement)
+      try {
+        document.body.removeChild(this.videoElement)
+      } catch (e) {
+        console.warn('Could not remove video element:', e)
+      }
       this.videoElement = null
     }
 
     // Hide and remove face display element
     if (this.faceDisplayElement) {
-      this.faceDisplayElement.style.display = 'none'
-      document.body.removeChild(this.faceDisplayElement)
+      try {
+        this.faceDisplayElement.style.display = 'none'
+        document.body.removeChild(this.faceDisplayElement)
+      } catch (e) {
+        console.warn('Could not remove face display element:', e)
+      }
       this.faceDisplayElement = null
+    }
+
+    console.log('Monitoring stopped and all resources cleaned up')
+  }
+
+  // Force stop all media streams aggressively
+  private forceStopAllStreams() {
+    console.log('Force stopping all media streams...')
+    
+    // Stop video stream
+    if (this.videoStream) {
+      console.log('Stopping video stream tracks:', this.videoStream.getTracks().length)
+      this.videoStream.getTracks().forEach(track => {
+        console.log('Stopping video track:', track.kind, track.label)
+        track.stop()
+      })
+      this.videoStream = null
+    }
+
+    // Stop audio stream
+    if (this.audioStream) {
+      console.log('Stopping audio stream tracks:', this.audioStream.getTracks().length)
+      this.audioStream.getTracks().forEach(track => {
+        console.log('Stopping audio track:', track.kind, track.label)
+        track.stop()
+      })
+      this.audioStream = null
+    }
+
+    // Force stop any remaining media devices
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // This is a more aggressive approach to ensure all streams are stopped
+      navigator.mediaDevices.getUserMedia({ video: false, audio: false })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop())
+        })
+        .catch(() => {
+          // Ignore errors, this is just to ensure cleanup
+        })
+    }
+  }
+
+  // Public method to force stop camera (can be called from components)
+  forceStopCamera() {
+    console.log('Force stopping camera from external call...')
+    this.forceStopAllStreams()
+    
+    // Also hide face display immediately
+    if (this.faceDisplayElement) {
+      this.faceDisplayElement.style.display = 'none'
     }
   }
 

@@ -377,11 +377,20 @@ export default function MCQPage() {
   // Monitoring cleanup function
   const stopMonitoringAndCleanup = () => {
     console.log('Stopping monitoring and cleaning up camera...')
+    
+    // Force stop camera immediately
+    contestMonitoring.forceStopCamera()
+    
+    // Stop all monitoring
     contestMonitoring.stopMonitoring()
+    
+    // Reset all states
     setIsMonitoring(false)
     setShowFullscreenWarning(false)
     setShowFaceWarning(false)
     setShowVoiceWarning(false)
+    
+    console.log('Camera cleanup completed')
   }
 
   // Monitoring handler functions
@@ -442,6 +451,12 @@ export default function MCQPage() {
     
     // Stop monitoring and cleanup camera when quiz is submitted
     stopMonitoringAndCleanup()
+    
+    // Additional cleanup after a short delay to ensure camera stops
+    setTimeout(() => {
+      console.log('Additional camera cleanup after delay...')
+      contestMonitoring.forceStopCamera()
+    }, 1000)
   }
 
   const handleRetakeQuiz = () => {
@@ -849,9 +864,17 @@ export default function MCQPage() {
                 <MaterialBadge variant="default" size="medium" className="mt-4 bg-green-100 text-green-800">
                   ✓ All Questions Answered
                 </MaterialBadge>
-                <MaterialBadge variant="default" size="medium" className="mt-2 bg-blue-100 text-blue-800">
-                  📹 Camera Monitoring Stopped
+                <MaterialBadge variant="default" size="medium" className="mt-2 bg-red-100 text-red-800 animate-pulse">
+                  📹 Camera Turned Off
                 </MaterialBadge>
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="text-blue-600">🔒</span>
+                    <span className="text-sm text-blue-800 font-medium">
+                      All monitoring has been stopped and camera access released
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* Score Summary */}

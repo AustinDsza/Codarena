@@ -102,7 +102,7 @@ export function FaceDetectionWarningDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[calc(var(--z-modal)+1)] mx-auto my-auto transform -translate-y-20">
+      <DialogContent className="max-w-md z-[calc(var(--z-modal)+1)] mx-auto my-auto transform -translate-y-32">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-orange-600">
             <Camera className="h-6 w-6" />
@@ -160,7 +160,7 @@ export function VoiceDetectionWarningDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[calc(var(--z-modal)+2)] mx-auto my-auto transform -translate-y-20">
+      <DialogContent className="max-w-md z-[calc(var(--z-modal)+2)] mx-auto my-auto transform -translate-y-32">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-purple-600">
             <Mic className="h-6 w-6" />
@@ -233,6 +233,12 @@ export function MonitoringStatus({
           {violations.fullscreen > 0 && (
             <MaterialBadge variant="error" size="small">
               FS: {violations.fullscreen}
+            </MaterialBadge>
+          )}
+          
+          {violations.voice > 0 && (
+            <MaterialBadge variant="secondary" size="small">
+              Voice: {violations.voice}
             </MaterialBadge>
           )}
         </div>

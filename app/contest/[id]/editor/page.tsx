@@ -625,6 +625,32 @@ int main() {
     return templates[lang as keyof typeof templates] || templates.python
   }
 
+  // Syntax highlighting function
+  const highlightCode = (code: string, lang: string) => {
+    if (lang === 'python') {
+      return code
+        .replace(/\b(def|if|else|elif|for|while|class|import|from|return|pass|print|and|or|not|in|is|True|False|None)\b/g, '<span class="text-blue-600 font-semibold">$1</span>')
+        .replace(/(#.*$)/gm, '<span class="text-green-600">$1</span>')
+        .replace(/(".*?"|'.*?')/g, '<span class="text-red-500">$1</span>')
+    } else if (lang === 'javascript') {
+      return code
+        .replace(/\b(function|const|let|var|if|else|for|while|class|return|console|log|true|false|null|undefined)\b/g, '<span class="text-blue-600 font-semibold">$1</span>')
+        .replace(/(\/\/.*$)/gm, '<span class="text-green-600">$1</span>')
+        .replace(/(".*?"|'.*?')/g, '<span class="text-red-500">$1</span>')
+    } else if (lang === 'java') {
+      return code
+        .replace(/\b(public|private|static|class|void|int|String|boolean|if|else|for|while|return|System|out|println)\b/g, '<span class="text-blue-600 font-semibold">$1</span>')
+        .replace(/(\/\/.*$)/gm, '<span class="text-green-600">$1</span>')
+        .replace(/(".*?")/g, '<span class="text-red-500">$1</span>')
+    } else if (lang === 'cpp') {
+      return code
+        .replace(/\b(include|using|namespace|class|public|private|int|void|return|std|cout|endl|if|else|for|while)\b/g, '<span class="text-blue-600 font-semibold">$1</span>')
+        .replace(/(\/\/.*$)/gm, '<span class="text-green-600">$1</span>')
+        .replace(/(".*?")/g, '<span class="text-red-500">$1</span>')
+    }
+    return code
+  }
+
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
@@ -1011,12 +1037,12 @@ int main() {
           <div className="border-b border-gray-200 p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Code Editor</h2>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 relative z-50">
                 <label className="text-sm text-gray-600">Language:</label>
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-white z-10 relative"
+                  className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-white shadow-lg"
                 >
                   <option value="python">Python</option>
                   <option value="javascript">JavaScript</option>
@@ -1079,13 +1105,23 @@ int main() {
 
           {/* Code Editor */}
           <div className="flex-1 p-4">
-            <textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="w-full h-full font-mono text-sm border border-gray-300 rounded-md p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Write your solution here..."
-              spellCheck={false}
-            />
+            <div className="relative">
+              {/* Syntax highlighted display */}
+              <div 
+                className="w-full h-full font-mono text-sm border border-gray-300 rounded-md p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white overflow-auto"
+                style={{ minHeight: '400px', whiteSpace: 'pre-wrap' }}
+                dangerouslySetInnerHTML={{ __html: highlightCode(code, language) }}
+              />
+              {/* Invisible textarea for input */}
+              <textarea
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="absolute inset-0 w-full h-full font-mono text-sm border-0 rounded-md p-4 resize-none focus:outline-none bg-transparent text-transparent caret-black"
+                placeholder="Write your solution here..."
+                spellCheck={false}
+                style={{ zIndex: 1 }}
+              />
+            </div>
           </div>
 
           {/* Output Panel */}

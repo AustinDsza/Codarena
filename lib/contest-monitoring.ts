@@ -65,7 +65,7 @@ export class ContestMonitoringService {
     this.faceDisplayElement.style.border = '2px solid #3b82f6'
     this.faceDisplayElement.style.borderRadius = '8px'
     this.faceDisplayElement.style.backgroundColor = '#000'
-    this.faceDisplayElement.style.zIndex = '9998' // Below monitoring status but above other elements
+    this.faceDisplayElement.style.zIndex = '9999' // Above all other elements
     this.faceDisplayElement.style.display = 'none' // Hidden initially
     this.faceDisplayElement.autoplay = true
     this.faceDisplayElement.muted = true
@@ -253,6 +253,17 @@ export class ContestMonitoringService {
         this.faceDisplayElement.srcObject = this.videoStream
         this.faceDisplayElement.play().catch(e => {
           console.error('Failed to play facecam during monitoring:', e)
+        })
+      }
+    } else {
+      // Force create facecam if it doesn't exist
+      console.log('Facecam element missing, creating it...')
+      this.setupFaceDisplay()
+      if (this.faceDisplayElement && this.videoStream) {
+        this.faceDisplayElement.srcObject = this.videoStream
+        this.faceDisplayElement.style.display = 'block'
+        this.faceDisplayElement.play().catch(e => {
+          console.error('Failed to play facecam after creation:', e)
         })
       }
     }

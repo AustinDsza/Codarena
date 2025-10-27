@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { MaterialButton } from "@/components/ui/material-button"
 import { MaterialCard } from "@/components/ui/material-card"
 import { MaterialBadge } from "@/components/ui/material-badge"
@@ -27,6 +27,13 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
+import { contestMonitoring } from "@/lib/contest-monitoring"
+import {
+  FullscreenWarningDialog,
+  FaceDetectionWarningDialog,
+  VoiceDetectionWarningDialog,
+  MonitoringStatus,
+} from "./components/MonitoringComponents"
 
 // Function to format Codarena Coins amount
 const formatCCAmount = (amount: number): string => {
@@ -282,6 +289,29 @@ export default function MCQPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [showIncompleteWarning, setShowIncompleteWarning] = useState(false)
 
+  // Monitoring state
+  const [isMonitoring, setIsMonitoring] = useState(false)
+  const [showFullscreenWarning, setShowFullscreenWarning] = useState(false)
+  const [showFaceWarning, setShowFaceWarning] = useState(false)
+  const [showVoiceWarning, setShowVoiceWarning] = useState(false)
+  const [violations, setViolations] = useState({
+    fullscreen: 0,
+    face: 0,
+    voice: 0,
+  })
+  const [dismissedWarnings, setDismissedWarnings] = useState({
+    face: false,
+    voice: false,
+  })
+  const [warningCooldowns, setWarningCooldowns] = useState({
+    face: 0,
+    voice: 0,
+  })
+
+  // Use refs for cooldown tracking to avoid async state issues
+  const faceCooldownRef = useRef(0)
+  const voiceCooldownRef = useRef(0)
+
   // Timer countdown
   useEffect(() => {
     if (timeLeft > 0 && !isSubmitted) {
@@ -291,6 +321,64 @@ export default function MCQPage() {
       handleSubmit()
     }
   }, [timeLeft, isSubmitted])
+
+  // Start monitoring when component mounts
+  useEffect(() => {
+    const startMonitoring = () => {
+      setIsMonitoring(true)
+      
+      contestMonitoring.startMonitoring({
+        onFaceNotDetected: () => {
+          const now = Date.now()
+          if (faceCooldownRef.current > 0 && now - faceCooldownRef.current < 15000) {
+            return // Still in cooldown period
+          }
+          setViolations(prev => ({ ...prev, face: prev.face + 1 }))
+          setShowFaceWarning(true)
+        },
+        onVoiceDetected: () => {
+          const now = Date.now()
+          if (voiceCooldownRef.current > 0 && now - voiceCooldownRef.current < 15000) {
+            return // Still in cooldown period
+          }
+          setViolations(prev => ({ ...prev, voice: prev.voice + 1 }))
+          setShowVoiceWarning(true)
+        },
+        onFullscreenExit: () => {
+          setViolations(prev => ({ ...prev, fullscreen: prev.fullscreen + 1 }))
+          setShowFullscreenWarning(true)
+        },
+      })
+    }
+
+    startMonitoring()
+
+    // Cleanup on unmount
+    return () => {
+      if (isMonitoring) {
+        contestMonitoring.stopMonitoring()
+        setIsMonitoring(false)
+      }
+    }
+  }, [])
+
+  // Monitoring handler functions
+  const handleReenterFullscreen = async () => {
+    const success = await contestMonitoring.enterFullscreen()
+    if (success) {
+      setShowFullscreenWarning(false)
+    }
+  }
+
+  const handleDismissFaceWarning = () => {
+    setShowFaceWarning(false)
+    faceCooldownRef.current = Date.now()
+  }
+
+  const handleDismissVoiceWarning = () => {
+    setShowVoiceWarning(false)
+    voiceCooldownRef.current = Date.now()
+  }
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -329,6 +417,12 @@ export default function MCQPage() {
     setIsSubmitted(true)
     setShowResults(true)
     setShowIncompleteWarning(false)
+    
+    // Stop monitoring when quiz is submitted
+    if (isMonitoring) {
+      contestMonitoring.stopMonitoring()
+      setIsMonitoring(false)
+    }
   }
 
   const handleRetakeQuiz = () => {
@@ -453,6 +547,25 @@ export default function MCQPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Monitoring Components */}
+      <MonitoringStatus isMonitoring={isMonitoring} violations={violations} />
+      
+      <FullscreenWarningDialog
+        isOpen={showFullscreenWarning}
+        onClose={() => setShowFullscreenWarning(false)}
+        onReenterFullscreen={handleReenterFullscreen}
+      />
+      
+      <FaceDetectionWarningDialog
+        isOpen={showFaceWarning}
+        onClose={handleDismissFaceWarning}
+      />
+      
+      <VoiceDetectionWarningDialog
+        isOpen={showVoiceWarning}
+        onClose={handleDismissVoiceWarning}
+      />
+
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1037,7 +1037,11 @@ int main() {
           <div className="border-b border-gray-200 p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Code Editor</h2>
-              <div className="flex items-center gap-2 relative z-50">
+            </div>
+
+            {/* Language Selection - Moved to avoid facecam overlap */}
+            <div className="flex items-center justify-end mb-4">
+              <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600">Language:</label>
                 <select
                   value={language}

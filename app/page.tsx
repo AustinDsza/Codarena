@@ -1094,7 +1094,6 @@ export default function CodarenaApp() {
   const [selectedPriceFilter, setSelectedPriceFilter] = useState<string>("all") // New price filter state
   const [currentTime, setCurrentTime] = useState<Date | null>(null)
   const [isScrolling, setIsScrolling] = useState(false)
-  const [showDisclaimer, setShowDisclaimer] = useState(true)
   const [showHowItWorks, setShowHowItWorks] = useState(true)
 
   // Add scroll indicator effect
@@ -1504,45 +1503,6 @@ export default function CodarenaApp() {
         </div>
       </header>
 
-      {/* Disclaimer Banner */}
-      {showDisclaimer && (
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              {/* Icon and Title Row */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="flex items-center justify-center w-8 h-8 bg-amber-100 rounded-full">
-                  <span className="text-amber-600 text-sm">⚠️</span>
-                </div>
-                <span className="font-semibold text-amber-800 text-sm sm:text-base">Demo Notice</span>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <p className="text-amber-700 text-sm sm:text-base leading-relaxed">
-                  This is a working demo with mock data. For the best experience, please open on desktop.
-                  <span className="block sm:inline mt-1 sm:mt-0 sm:ml-1 font-medium">
-                    We're currently raising funds to launch our MVP and scale.
-                  </span>
-                </p>
-              </div>
-
-              {/* Close Button */}
-              <div className="flex-shrink-0 self-start sm:self-center">
-                <MaterialButton
-                  variant="text"
-                  size="small"
-                  onClick={() => setShowDisclaimer(false)}
-                  className="text-amber-600 hover:bg-amber-100 p-2 rounded-full min-w-0 w-8 h-8"
-                  aria-label="Close disclaimer"
-                >
-                  <X className="h-4 w-4" />
-                </MaterialButton>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Hero Section - Matching the provided design exactly */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">

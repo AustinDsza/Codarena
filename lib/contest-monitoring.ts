@@ -17,6 +17,7 @@ export class ContestMonitoringService {
   private dataArray: Uint8Array | null = null
   private faceDisplayElement: HTMLVideoElement | null = null
   private soundAlert: HTMLAudioElement | null = null
+  private fullscreenChangeHandler: (() => void) | null = null
 
   // Callbacks for violations
   private onFaceNotDetected?: () => void
@@ -281,6 +282,31 @@ export class ContestMonitoringService {
   }
 
   private startFullscreenMonitoring() {
+    // Add immediate event listeners for fullscreen changes
+    this.fullscreenChangeHandler = () => {
+      if (!this.isMonitoring) return
+
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      )
+
+      if (!isFullscreen) {
+        // Play sound immediately when fullscreen is exited
+        this.playSoundAlert()
+        this.onFullscreenExit?.()
+      }
+    }
+
+    // Listen for fullscreen change events (immediate response)
+    document.addEventListener('fullscreenchange', this.fullscreenChangeHandler)
+    document.addEventListener('webkitfullscreenchange', this.fullscreenChangeHandler)
+    document.addEventListener('mozfullscreenchange', this.fullscreenChangeHandler)
+    document.addEventListener('MSFullscreenChange', this.fullscreenChangeHandler)
+
+    // Also keep the interval check as backup (less frequent)
     this.fullscreenCheckInterval = setInterval(() => {
       if (!this.isMonitoring) return
 
@@ -295,7 +321,7 @@ export class ContestMonitoringService {
         this.playSoundAlert()
         this.onFullscreenExit?.()
       }
-    }, 500) // Check every 500ms
+    }, 2000) // Check every 2 seconds as backup
   }
 
   private playSoundAlert() {
@@ -305,29 +331,32 @@ export class ContestMonitoringService {
       // Create a new audio context for each alert to ensure it works
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
       
-      // Create a more noticeable alert sound
+      // Create a more noticeable and immediate alert sound
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
       
       oscillator.connect(gainNode)
       gainNode.connect(audioContext.destination)
       
-      // Create a distinctive beep pattern
-      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime)
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1)
-      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2)
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.3)
+      // Create a distinctive, loud beep pattern that starts immediately
+      oscillator.frequency.setValueAtTime(1200, audioContext.currentTime) // Higher frequency for urgency
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.05)
+      oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.1)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.15)
+      oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.25)
       
-      gainNode.gain.setValueAtTime(0.7, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4)
+      // Higher volume for immediate attention
+      gainNode.gain.setValueAtTime(0.8, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
       
       oscillator.start(audioContext.currentTime)
-      oscillator.stop(audioContext.currentTime + 0.4)
+      oscillator.stop(audioContext.currentTime + 0.3)
       
       // Close the audio context after playing
       setTimeout(() => {
         audioContext.close()
-      }, 500)
+      }, 400)
     } catch (error) {
       console.warn('Could not play sound alert:', error)
     }
@@ -350,6 +379,15 @@ export class ContestMonitoringService {
     if (this.fullscreenCheckInterval) {
       clearInterval(this.fullscreenCheckInterval)
       this.fullscreenCheckInterval = null
+    }
+
+    // Remove fullscreen event listeners
+    if (this.fullscreenChangeHandler) {
+      document.removeEventListener('fullscreenchange', this.fullscreenChangeHandler)
+      document.removeEventListener('webkitfullscreenchange', this.fullscreenChangeHandler)
+      document.removeEventListener('mozfullscreenchange', this.fullscreenChangeHandler)
+      document.removeEventListener('MSFullscreenChange', this.fullscreenChangeHandler)
+      this.fullscreenChangeHandler = null
     }
 
     // Stop streams

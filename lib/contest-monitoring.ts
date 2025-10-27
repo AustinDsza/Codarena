@@ -421,24 +421,29 @@ export class ContestMonitoringService {
       gainNode.connect(audioContext.destination)
       
       // Create a distinctive, loud beep pattern that starts immediately
-      oscillator.frequency.setValueAtTime(1200, audioContext.currentTime) // Higher frequency for urgency
+      // Higher frequency and more aggressive pattern for MCQ contests
+      oscillator.frequency.setValueAtTime(1500, audioContext.currentTime) // Even higher frequency
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.05)
-      oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.1)
+      oscillator.frequency.setValueAtTime(1500, audioContext.currentTime + 0.1)
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.15)
-      oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2)
+      oscillator.frequency.setValueAtTime(1500, audioContext.currentTime + 0.2)
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.25)
+      oscillator.frequency.setValueAtTime(1500, audioContext.currentTime + 0.3)
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.35)
       
-      // Higher volume for immediate attention
-      gainNode.gain.setValueAtTime(0.8, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+      // Higher volume for immediate attention - increased for MCQ contests
+      gainNode.gain.setValueAtTime(0.9, audioContext.currentTime) // Increased from 0.8 to 0.9
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4)
       
       oscillator.start(audioContext.currentTime)
-      oscillator.stop(audioContext.currentTime + 0.3)
+      oscillator.stop(audioContext.currentTime + 0.4)
       
       // Close the audio context after playing
       setTimeout(() => {
         audioContext.close()
-      }, 400)
+      }, 500)
+      
+      console.log('Fullscreen violation sound alert played for MCQ contest')
     } catch (error) {
       console.warn('Could not play sound alert:', error)
     }

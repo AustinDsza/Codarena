@@ -46,25 +46,34 @@ export function FullscreenWarningDialog({
       <DialogContent className="max-w-md z-[var(--z-modal)] mx-auto my-auto transform -translate-y-32">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-red-600">
-            <AlertCircle className="h-6 w-6" />
+            <AlertCircle className="h-6 w-6 animate-pulse" />
             Fullscreen Violation Detected
           </DialogTitle>
           <DialogDescription>
-            You have exited fullscreen mode during the contest. This is not allowed and may result in disqualification.
+            🔊 <strong>Sound Alert Triggered!</strong> You have exited fullscreen mode during the MCQ contest. This is not allowed and may result in disqualification.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-red-600 mt-0.5" />
+              <AlertCircle className="h-4 w-4 text-red-600 mt-0.5 animate-pulse" />
               <div className="text-sm">
-                <h5 className="font-medium text-red-800 mb-1">Warning</h5>
+                <h5 className="font-medium text-red-800 mb-1">⚠️ Violation Warning</h5>
                 <p className="text-red-700">
-                  Exiting fullscreen mode during the contest is considered a violation of contest rules. 
-                  Please return to fullscreen mode immediately to continue.
+                  Exiting fullscreen mode during the MCQ contest is considered a violation of contest rules. 
+                  A sound alert has been triggered. Please return to fullscreen mode immediately to continue.
                 </p>
               </div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-600">🔊</span>
+              <span className="text-sm text-yellow-800 font-medium">
+                Sound alert played to notify you of the violation
+              </span>
             </div>
           </div>
 

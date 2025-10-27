@@ -28,8 +28,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { contestMonitoring } from "@/lib/contest-monitoring"
 import {
   FullscreenWarningDialog,
-  FaceDetectionWarningDialog,
-  VoiceDetectionWarningDialog,
   MonitoringStatus,
 } from "./components/MonitoringComponents"
 
@@ -448,25 +446,11 @@ export default function ContestEditorPage() {
   // Monitoring state
   const [isMonitoring, setIsMonitoring] = useState(false)
   const [showFullscreenWarning, setShowFullscreenWarning] = useState(false)
-  const [showFaceWarning, setShowFaceWarning] = useState(false)
-  const [showVoiceWarning, setShowVoiceWarning] = useState(false)
   const [violations, setViolations] = useState({
     fullscreen: 0,
     face: 0,
     voice: 0,
   })
-  const [dismissedWarnings, setDismissedWarnings] = useState({
-    face: false,
-    voice: false,
-  })
-  const [warningCooldowns, setWarningCooldowns] = useState({
-    face: 0,
-    voice: 0,
-  })
-
-  // Use refs for cooldown tracking to avoid async state issues
-  const faceCooldownRef = useRef(0)
-  const voiceCooldownRef = useRef(0)
 
   // Load contest data
   useEffect(() => {
@@ -495,27 +479,11 @@ export default function ContestEditorPage() {
     }
   }, [contestId, currentProblem])
 
-  // Start monitoring system
+  // Start monitoring system (only fullscreen monitoring)
   const startMonitoring = () => {
     setIsMonitoring(true)
     
     contestMonitoring.startMonitoring({
-      onFaceNotDetected: () => {
-        const now = Date.now()
-        if (faceCooldownRef.current > 0 && now - faceCooldownRef.current < 15000) {
-          return // Still in cooldown period
-        }
-        setViolations(prev => ({ ...prev, face: prev.face + 1 }))
-        setShowFaceWarning(true)
-      },
-      onVoiceDetected: () => {
-        const now = Date.now()
-        if (voiceCooldownRef.current > 0 && now - voiceCooldownRef.current < 15000) {
-          return // Still in cooldown period
-        }
-        setViolations(prev => ({ ...prev, voice: prev.voice + 1 }))
-        setShowVoiceWarning(true)
-      },
       onFullscreenExit: () => {
         setViolations(prev => ({ ...prev, fullscreen: prev.fullscreen + 1 }))
         setShowFullscreenWarning(true)
@@ -529,21 +497,6 @@ export default function ContestEditorPage() {
     if (success) {
       setShowFullscreenWarning(false)
     }
-  }
-
-  // Handle dismiss warnings with 15-second cooldown
-  const handleDismissFaceWarning = () => {
-    setShowFaceWarning(false)
-    faceCooldownRef.current = Date.now()
-    setDismissedWarnings(prev => ({ ...prev, face: true }))
-    setWarningCooldowns(prev => ({ ...prev, face: Date.now() }))
-  }
-
-  const handleDismissVoiceWarning = () => {
-    setShowVoiceWarning(false)
-    voiceCooldownRef.current = Date.now()
-    setDismissedWarnings(prev => ({ ...prev, voice: true }))
-    setWarningCooldowns(prev => ({ ...prev, voice: Date.now() }))
   }
 
   // Update code template when language changes
@@ -799,18 +752,6 @@ int main() {
         isOpen={showFullscreenWarning}
         onClose={() => setShowFullscreenWarning(false)}
         onReenterFullscreen={handleReenterFullscreen}
-      />
-      
-      <FaceDetectionWarningDialog
-        isOpen={showFaceWarning}
-        onClose={() => setShowFaceWarning(false)}
-        onDismiss={handleDismissFaceWarning}
-      />
-      
-      <VoiceDetectionWarningDialog
-        isOpen={showVoiceWarning}
-        onClose={() => setShowVoiceWarning(false)}
-        onDismiss={handleDismissVoiceWarning}
       />
 
       {/* Header */}

@@ -43,7 +43,7 @@ export function FullscreenWarningDialog({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md z-[var(--z-modal)] mx-auto my-auto transform -translate-y-20">
+      <DialogContent className="max-w-md z-[var(--z-modal)] mx-auto my-auto transform -translate-y-32">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-red-600">
             <AlertCircle className="h-6 w-6" />
@@ -222,7 +222,7 @@ export function MonitoringStatus({
   if (!isMonitoring) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-4 right-4 z-[var(--z-sticky)]">
       <MaterialCard elevation={2} className="p-3 bg-white border border-gray-200">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -233,18 +233,6 @@ export function MonitoringStatus({
           {violations.fullscreen > 0 && (
             <MaterialBadge variant="error" size="small">
               FS: {violations.fullscreen}
-            </MaterialBadge>
-          )}
-          
-          {violations.face > 0 && (
-            <MaterialBadge variant="warning" size="small">
-              Face: {violations.face}
-            </MaterialBadge>
-          )}
-          
-          {violations.voice > 0 && (
-            <MaterialBadge variant="secondary" size="small">
-              Voice: {violations.voice}
             </MaterialBadge>
           )}
         </div>

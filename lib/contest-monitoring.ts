@@ -57,17 +57,18 @@ export class ContestMonitoringService {
     // Create a visible video element for face display in corner
     this.faceDisplayElement = document.createElement('video')
     this.faceDisplayElement.style.position = 'fixed'
-    this.faceDisplayElement.style.top = '20px'
+    this.faceDisplayElement.style.top = '80px' // Move down to avoid overlap with monitoring status
     this.faceDisplayElement.style.right = '20px'
     this.faceDisplayElement.style.width = '120px'
     this.faceDisplayElement.style.height = '90px'
     this.faceDisplayElement.style.border = '2px solid #3b82f6'
     this.faceDisplayElement.style.borderRadius = '8px'
     this.faceDisplayElement.style.backgroundColor = '#000'
-    this.faceDisplayElement.style.zIndex = '9999'
+    this.faceDisplayElement.style.zIndex = '10000' // Higher z-index to stay above dialogs
     this.faceDisplayElement.style.display = 'none' // Hidden initially
     this.faceDisplayElement.autoplay = true
     this.faceDisplayElement.muted = true
+    this.faceDisplayElement.playsInline = true // Important for mobile compatibility
     document.body.appendChild(this.faceDisplayElement)
   }
 
@@ -198,13 +199,7 @@ export class ContestMonitoringService {
 
     this.isMonitoring = true
 
-    // Start face detection
-    this.startFaceDetection()
-
-    // Start voice detection
-    this.startVoiceDetection()
-
-    // Start fullscreen monitoring
+    // Only start fullscreen monitoring (face detection removed as requested)
     this.startFullscreenMonitoring()
   }
 

@@ -353,14 +353,36 @@ export default function MCQPage() {
 
     startMonitoring()
 
-    // Cleanup on unmount
+    // Cleanup on unmount - always stop monitoring regardless of state
     return () => {
-      if (isMonitoring) {
-        contestMonitoring.stopMonitoring()
-        setIsMonitoring(false)
-      }
+      console.log('MCQ component unmounting, stopping monitoring...')
+      stopMonitoringAndCleanup()
     }
   }, [])
+
+  // Add cleanup on page unload/navigation
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log('Page unloading, cleaning up camera...')
+      stopMonitoringAndCleanup()
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
+
+  // Monitoring cleanup function
+  const stopMonitoringAndCleanup = () => {
+    console.log('Stopping monitoring and cleaning up camera...')
+    contestMonitoring.stopMonitoring()
+    setIsMonitoring(false)
+    setShowFullscreenWarning(false)
+    setShowFaceWarning(false)
+    setShowVoiceWarning(false)
+  }
 
   // Monitoring handler functions
   const handleReenterFullscreen = async () => {
@@ -418,11 +440,8 @@ export default function MCQPage() {
     setShowResults(true)
     setShowIncompleteWarning(false)
     
-    // Stop monitoring when quiz is submitted
-    if (isMonitoring) {
-      contestMonitoring.stopMonitoring()
-      setIsMonitoring(false)
-    }
+    // Stop monitoring and cleanup camera when quiz is submitted
+    stopMonitoringAndCleanup()
   }
 
   const handleRetakeQuiz = () => {
@@ -829,6 +848,9 @@ export default function MCQPage() {
                 </p>
                 <MaterialBadge variant="default" size="medium" className="mt-4 bg-green-100 text-green-800">
                   ✓ All Questions Answered
+                </MaterialBadge>
+                <MaterialBadge variant="default" size="medium" className="mt-2 bg-blue-100 text-blue-800">
+                  📹 Camera Monitoring Stopped
                 </MaterialBadge>
               </div>
 

@@ -126,6 +126,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const createUserProfile = async (user: User) => {
     try {
+      console.log('Creating user profile for:', {
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.name,
+        username: user.user_metadata?.username
+      })
+
+      // Validate user ID is a valid UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      if (!uuidRegex.test(user.id)) {
+        console.error('Invalid user ID format:', user.id)
+        return
+      }
+
       // Check if user already exists
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
@@ -157,11 +171,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error && error.message.includes('username')) {
           console.log('Username field not found, inserting without username')
           const { error: fallbackError } = await supabaseAdmin.from('users').insert(baseUserData)
+          if (fallbackError) {
+            console.error('Fallback insert also failed:', fallbackError)
+            console.error('Fallback error details:', JSON.stringify(fallbackError, null, 2))
+          } else {
+            console.log('User profile created successfully (without username)')
+          }
           error = fallbackError
         }
 
         if (error) {
           console.error('Error creating user profile:', error)
+          console.error('Error details:', JSON.stringify(error, null, 2))
+          console.error('User data that failed to insert:', userDataWithUsername)
         } else {
           console.log('User profile created successfully')
         }

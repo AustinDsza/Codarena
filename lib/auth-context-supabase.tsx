@@ -101,6 +101,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             wallet_balance: 1000
           }
         }
+
+        // If username field doesn't exist, return user data without username
+        if (error.message.includes('username')) {
+          console.log('Username field not found in database, using auth data')
+          return {
+            id: authUser.id,
+            email: authUser.email,
+            name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+            username: authUser.user_metadata?.username || '@' + (authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'user').toLowerCase(),
+            wallet_balance: 1000
+          }
+        }
         console.error('Error fetching user profile:', error)
         return null
       }
@@ -128,13 +140,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!existingUser) {
         // Use the service role key for this operation to bypass RLS
-        const { error } = await supabaseAdmin.from('users').insert({
+        const baseUserData = {
           id: user.id,
           email: user.email!,
           name: user.user_metadata?.name || user.email!.split('@')[0],
-          username: user.user_metadata?.username || '@' + (user.user_metadata?.name || user.email!.split('@')[0]).toLowerCase(),
           wallet_balance: 1000, // Starting balance
-        })
+        }
+
+        // Try to insert with username first (if field exists)
+        const username = user.user_metadata?.username || '@' + (user.user_metadata?.name || user.email!.split('@')[0]).toLowerCase()
+        const userDataWithUsername = { ...baseUserData, username }
+
+        let { error } = await supabaseAdmin.from('users').insert(userDataWithUsername)
+
+        // If username field doesn't exist, try without it
+        if (error && error.message.includes('username')) {
+          console.log('Username field not found, inserting without username')
+          const { error: fallbackError } = await supabaseAdmin.from('users').insert(baseUserData)
+          error = fallbackError
+        }
 
         if (error) {
           console.error('Error creating user profile:', error)

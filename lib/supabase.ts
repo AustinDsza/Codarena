@@ -20,7 +20,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Server-side client with service role key for admin operations
 export const supabaseAdmin = createClient(
   supabaseUrl,
-  supabaseServiceRoleKey || supabaseAnonKey
+  supabaseServiceRoleKey || supabaseAnonKey,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      headers: {
+        'Authorization': `Bearer ${supabaseServiceRoleKey || supabaseAnonKey}`,
+      },
+    },
+  }
 )
 
 // Database types

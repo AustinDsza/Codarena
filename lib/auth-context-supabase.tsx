@@ -168,19 +168,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const username = user.user_metadata?.username || '@' + (user.user_metadata?.name || user.email!.split('@')[0]).toLowerCase()
         const userDataWithUsername = { ...baseUserData, username }
 
-        let { error } = await supabaseAdmin.from('users').insert(userDataWithUsername)
+        console.log('Attempting to insert user data:', userDataWithUsername)
 
-        // If username field doesn't exist, try without it
-        if (error && error.message.includes('username')) {
-          console.log('Username field not found, inserting without username')
-          const { error: fallbackError } = await supabaseAdmin.from('users').insert(baseUserData)
-          if (fallbackError) {
-            console.error('Fallback insert also failed:', fallbackError)
-            console.error('Fallback error details:', JSON.stringify(fallbackError, null, 2))
-          } else {
-            console.log('User profile created successfully (without username)')
+        // Try using RPC function to bypass RLS
+        const { data: rpcData, error: rpcError } = await supabaseAdmin.rpc('create_user_profile', {
+          user_id: user.id,
+          user_email: user.email!,
+          user_name: user.user_metadata?.name || user.email!.split('@')[0],
+          user_username: username,
+          user_wallet_balance: 1000
+        })
+
+        let error = rpcError
+
+        // If RPC doesn't exist, fall back to direct insert
+        if (error && error.message.includes('function') && error.message.includes('does not exist')) {
+          console.log('RPC function not found, trying direct insert')
+          let { error: insertError } = await supabaseAdmin.from('users').insert(userDataWithUsername)
+
+          // If username field doesn't exist, try without it
+          if (insertError && insertError.message.includes('username')) {
+            console.log('Username field not found, inserting without username')
+            const { error: fallbackError } = await supabaseAdmin.from('users').insert(baseUserData)
+            if (fallbackError) {
+              console.error('Fallback insert also failed:', fallbackError)
+              console.error('Fallback error details:', JSON.stringify(fallbackError, null, 2))
+            } else {
+              console.log('User profile created successfully (without username)')
+            }
+            insertError = fallbackError
           }
-          error = fallbackError
+          error = insertError
         }
 
         if (error) {

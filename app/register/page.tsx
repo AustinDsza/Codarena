@@ -15,6 +15,7 @@ import {
   CheckCircle,
   AlertCircle,
   UserPlus,
+  AtSign,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -23,6 +24,7 @@ import { useAuth } from "@/lib/auth-context-supabase"
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -41,8 +43,18 @@ export default function RegisterPage() {
   }
 
   const validateForm = () => {
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all fields")
+      return false
+    }
+
+    if (formData.username.length < 3) {
+      setError("Username must be at least 3 characters long")
+      return false
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      setError("Username can only contain letters, numbers, and underscores")
       return false
     }
 
@@ -79,7 +91,8 @@ export default function RegisterPage() {
       const { error: signUpError } = await signUp(
         formData.email,
         formData.password,
-        formData.name
+        formData.name,
+        formData.username
       )
 
       if (signUpError) {
@@ -195,6 +208,23 @@ export default function RegisterPage() {
                 required
                 className="w-full"
               />
+            </div>
+
+            {/* Username Field */}
+            <div>
+              <MaterialInput
+                type="text"
+                label="Username"
+                value={formData.username}
+                onChange={(e) => handleInputChange("username", e.target.value)}
+                placeholder="Choose a unique username"
+                startIcon={<AtSign className="h-4 w-4" />}
+                required
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Only letters, numbers, and underscores allowed. Min 3 characters.
+              </p>
             </div>
 
             {/* Email Field */}

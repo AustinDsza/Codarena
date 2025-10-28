@@ -17,16 +17,26 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<any>(null) // Changed to any to include profile data
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session)
-      setUser(session?.user ?? null)
       setLoading(false)
+      
+      if (session?.user) {
+        const profile = await fetchUserProfile(session.user)
+        if (profile) {
+          setUser(profile)
+        } else {
+          setUser(session.user)
+        }
+      } else {
+        setUser(null)
+      }
     })
 
     // Listen for auth changes
@@ -34,17 +44,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session)
-      setUser(session?.user ?? null)
       setLoading(false)
 
-      // Create user profile if new user
-      if (event === 'SIGNED_IN' && session?.user) {
-        await createUserProfile(session.user)
+      if (session?.user) {
+        // Create user profile if new user
+        if (event === 'SIGNED_IN') {
+          await createUserProfile(session.user)
+        }
+        
+        // Fetch user profile from database
+        const profile = await fetchUserProfile(session.user)
+        if (profile) {
+          setUser(profile)
+        } else {
+          setUser(session.user)
+        }
+      } else {
+        setUser(null)
       }
     })
 
     return () => subscription.unsubscribe()
   }, [])
+
+  const fetchUserProfile = async (authUser: User) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching user profile:', error)
+        return null
+      }
+
+      return profile
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+      return null
+    }
+  }
 
   const createUserProfile = async (user: User) => {
     try {
@@ -60,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           id: user.id,
           email: user.email!,
           name: user.user_metadata?.name || user.email!.split('@')[0],
-          username: '@' + (user.user_metadata?.name || user.email!.split('@')[0]).toLowerCase(),
+          username: user.user_metadata?.username || '@' + (user.user_metadata?.name || user.email!.split('@')[0]).toLowerCase(),
           wallet_balance: 1000, // Starting balance
         })
 
@@ -75,13 +116,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string, username: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           name,
+          username,
         },
       },
     })

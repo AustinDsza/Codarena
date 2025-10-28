@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get result from Judge0
-    const response = await fetch(`${JUDGE0_API_URL}/submissions/${token}`, {
+    // Get result from Judge0 (request base64-encoded outputs)
+    const response = await fetch(`${JUDGE0_API_URL}/submissions/${token}?base64_encoded=true`, {
       method: 'GET',
       headers: {
         'X-RapidAPI-Key': JUDGE0_API_KEY,
@@ -60,15 +60,17 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Result is ready
+    // Result is ready - decode base64 fields
+    const fromBase64 = (val: string | null) => (val ? Buffer.from(val, 'base64').toString('utf8') : null)
+
     return NextResponse.json({
       success: true,
       status: 'completed',
       result: {
-        stdout: result.stdout,
-        stderr: result.stderr,
-        compile_output: result.compile_output,
-        message: result.message,
+        stdout: fromBase64(result.stdout),
+        stderr: fromBase64(result.stderr),
+        compile_output: fromBase64(result.compile_output),
+        message: fromBase64(result.message),
         time: result.time,
         memory: result.memory,
         status: result.status

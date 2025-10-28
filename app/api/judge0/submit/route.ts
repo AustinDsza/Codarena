@@ -64,12 +64,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Prepare submission data
+    // Prepare submission data (use base64 to avoid UTF-8 conversion issues in Judge0)
+    const toBase64 = (value: string) => Buffer.from(value ?? '', 'utf8').toString('base64')
+
     const submission: Judge0Submission = {
       language_id: languageId,
-      source_code,
-      stdin,
-      expected_output,
+      // Encode fields to base64 (Judge0 recommends base64 for arbitrary content)
+      source_code: toBase64(source_code),
+      stdin: toBase64(stdin),
+      expected_output: expected_output ? toBase64(expected_output) : undefined,
       cpu_time_limit,
       memory_limit,
     }
@@ -85,8 +88,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Submit to Judge0
-    const response = await fetch(`${JUDGE0_API_URL}/submissions`, {
+    // Submit to Judge0 (with base64_encoded flag)
+    const response = await fetch(`${JUDGE0_API_URL}/submissions?base64_encoded=true&wait=false`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

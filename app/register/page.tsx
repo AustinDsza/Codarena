@@ -84,11 +84,21 @@ export default function RegisterPage() {
 
       if (signUpError) {
         console.error('Registration error:', signUpError)
-        setError(signUpError.message || "Registration failed. Please try again.")
+        
+        // Handle specific error cases
+        if (signUpError.message.includes('User already registered')) {
+          setError("An account with this email already exists. Please try logging in instead.")
+        } else if (signUpError.message.includes('Password should be at least')) {
+          setError("Password must be at least 6 characters long.")
+        } else {
+          setError(signUpError.message || "Registration failed. Please try again.")
+        }
         return
       }
 
+      // Show success message about email confirmation
       setSuccess(true)
+      setError("") // Clear any previous errors
       
       // Redirect after success message
       setTimeout(() => {
@@ -121,7 +131,8 @@ export default function RegisterPage() {
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Registration Successful!</h2>
-              <p className="text-gray-600">Welcome to Codarena! Redirecting you to the dashboard...</p>
+              <p className="text-gray-600 mb-2">Welcome to Codarena! Please check your email and click the confirmation link to activate your account.</p>
+              <p className="text-sm text-blue-600">You can then log in with your credentials.</p>
             </div>
             
             <div className="flex items-center justify-center">

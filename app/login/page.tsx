@@ -46,7 +46,15 @@ export default function LoginPage() {
 
       if (signInError) {
         console.error('Login error:', signInError)
-        setError(signInError.message || "Login failed. Please try again.")
+        
+        // Handle specific error cases
+        if (signInError.message.includes('Email not confirmed')) {
+          setError("Please check your email and click the confirmation link before logging in.")
+        } else if (signInError.message.includes('Invalid login credentials')) {
+          setError("Invalid email or password. Please try again.")
+        } else {
+          setError(signInError.message || "Login failed. Please try again.")
+        }
         return
       }
 

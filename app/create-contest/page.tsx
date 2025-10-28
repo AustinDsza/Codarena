@@ -323,6 +323,288 @@ const defaultDistributionSchemes = {
   ],
 }
 
+// MCQ Question Form Component
+function MCQQuestionForm({ question, onSave, onCancel }: {
+  question: MCQQuestion | null
+  onSave: (question: MCQQuestion) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState<MCQQuestion>(
+    question || {
+      id: Date.now().toString(),
+      question: "",
+      options: ["", "", "", ""],
+      correctAnswer: 0,
+      explanation: "",
+    }
+  )
+
+  const handleSave = () => {
+    if (!formData.question.trim()) return
+    if (formData.options.filter(opt => opt.trim()).length < 2) return
+    onSave(formData)
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="question">Question</Label>
+        <Textarea
+          id="question"
+          value={formData.question}
+          onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+          placeholder="Enter your question here..."
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label>Options</Label>
+        <div className="space-y-2 mt-2">
+          {formData.options.map((option, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <RadioGroup
+                value={formData.correctAnswer.toString()}
+                onValueChange={(value) => setFormData({ ...formData, correctAnswer: parseInt(value) })}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={index.toString()} id={`option-${index}`} />
+                  <Label htmlFor={`option-${index}`} className="text-sm font-normal">
+                    Option {index + 1}
+                  </Label>
+                </div>
+              </RadioGroup>
+              <Input
+                value={option}
+                onChange={(e) => {
+                  const newOptions = [...formData.options]
+                  newOptions[index] = e.target.value
+                  setFormData({ ...formData, options: newOptions })
+                }}
+                placeholder={`Option ${index + 1}`}
+                className="flex-1"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="explanation">Explanation (Optional)</Label>
+        <Textarea
+          id="explanation"
+          value={formData.explanation}
+          onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
+          placeholder="Explain why this is the correct answer..."
+          className="mt-1"
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4">
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave}>
+          {question ? "Update" : "Add"} Question
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// DSA Problem Form Component
+function DSAProblemForm({ problem, onSave, onCancel }: {
+  problem: DSAQuestion | null
+  onSave: (problem: DSAQuestion) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState<DSAQuestion>(
+    problem || {
+      id: Date.now().toString(),
+      title: "",
+      description: "",
+      difficulty: "easy",
+      timeLimit: "60",
+      memoryLimit: "256",
+      testCases: [],
+      constraints: "",
+      examples: [],
+    }
+  )
+
+  const handleSave = () => {
+    if (!formData.title.trim() || !formData.description.trim()) return
+    onSave(formData)
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="title">Problem Title</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder="Enter problem title..."
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Problem Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Describe the problem..."
+          className="mt-1"
+          rows={4}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="difficulty">Difficulty</Label>
+          <Select
+            value={formData.difficulty}
+            onValueChange={(value) => setFormData({ ...formData, difficulty: value })}
+          >
+            <SelectTrigger className="mt-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="easy">Easy</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="hard">Hard</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label htmlFor="timeLimit">Time Limit (seconds)</Label>
+          <Input
+            id="timeLimit"
+            type="number"
+            value={formData.timeLimit}
+            onChange={(e) => setFormData({ ...formData, timeLimit: e.target.value })}
+            className="mt-1"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="constraints">Constraints</Label>
+        <Textarea
+          id="constraints"
+          value={formData.constraints}
+          onChange={(e) => setFormData({ ...formData, constraints: e.target.value })}
+          placeholder="Enter problem constraints..."
+          className="mt-1"
+          rows={2}
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4">
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave}>
+          {problem ? "Update" : "Add"} Problem
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// Design Problem Form Component
+function DesignProblemForm({ problem, onSave, onCancel }: {
+  problem: DesignProblem | null
+  onSave: (problem: DesignProblem) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState<DesignProblem>(
+    problem || {
+      id: Date.now().toString(),
+      title: "",
+      description: "",
+      difficulty: "easy",
+      requirements: [],
+      deliverables: [],
+      evaluationCriteria: "",
+    }
+  )
+
+  const handleSave = () => {
+    if (!formData.title.trim() || !formData.description.trim()) return
+    onSave(formData)
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="title">Problem Title</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder="Enter design challenge title..."
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Problem Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Describe the design challenge..."
+          className="mt-1"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="difficulty">Difficulty</Label>
+        <Select
+          value={formData.difficulty}
+          onValueChange={(value) => setFormData({ ...formData, difficulty: value })}
+        >
+          <SelectTrigger className="mt-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="easy">Easy</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="hard">Hard</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="evaluationCriteria">Evaluation Criteria</Label>
+        <Textarea
+          id="evaluationCriteria"
+          value={formData.evaluationCriteria}
+          onChange={(e) => setFormData({ ...formData, evaluationCriteria: e.target.value })}
+          placeholder="How will this design be evaluated?"
+          className="mt-1"
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4">
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave}>
+          {problem ? "Update" : "Add"} Problem
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 export default function CreateContestPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [userTier, setUserTier] = useState<"regular" | "verified">("regular")
@@ -2546,6 +2828,90 @@ export default function CreateContestPage() {
           </div>
         </div>
       </div>
+
+      {/* MCQ Question Form Modal */}
+      <Dialog open={showMCQForm} onOpenChange={setShowMCQForm}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add MCQ Question</DialogTitle>
+            <DialogDescription>
+              Create a new multiple choice question for your quiz contest.
+            </DialogDescription>
+          </DialogHeader>
+          <MCQQuestionForm
+            question={editingMCQ}
+            onSave={(question) => {
+              if (editingMCQ) {
+                updateMCQQuestion(editingMCQ.id, question)
+                setEditingMCQ(null)
+              } else {
+                addMCQQuestion(question)
+              }
+              setShowMCQForm(false)
+            }}
+            onCancel={() => {
+              setEditingMCQ(null)
+              setShowMCQForm(false)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* DSA Problem Form Modal */}
+      <Dialog open={showDSAForm} onOpenChange={setShowDSAForm}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add DSA Problem</DialogTitle>
+            <DialogDescription>
+              Create a new coding problem for your DSA contest.
+            </DialogDescription>
+          </DialogHeader>
+          <DSAProblemForm
+            problem={editingDSA}
+            onSave={(problem) => {
+              if (editingDSA) {
+                updateDSAQuestion(editingDSA.id, problem)
+                setEditingDSA(null)
+              } else {
+                addDSAQuestion(problem)
+              }
+              setShowDSAForm(false)
+            }}
+            onCancel={() => {
+              setEditingDSA(null)
+              setShowDSAForm(false)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Design Problem Form Modal */}
+      <Dialog open={showDesignForm} onOpenChange={setShowDesignForm}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Design Problem</DialogTitle>
+            <DialogDescription>
+              Create a new design challenge for your contest.
+            </DialogDescription>
+          </DialogHeader>
+          <DesignProblemForm
+            problem={editingDesign}
+            onSave={(problem) => {
+              if (editingDesign) {
+                updateDesignProblem(editingDesign.id, problem)
+                setEditingDesign(null)
+              } else {
+                addDesignProblem(problem)
+              }
+              setShowDesignForm(false)
+            }}
+            onCancel={() => {
+              setEditingDesign(null)
+              setShowDesignForm(false)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

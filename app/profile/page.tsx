@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth-context-supabase"
 import { MaterialButton } from "@/components/ui/material-button"
 import { MaterialCard } from "@/components/ui/material-card"
 import { MaterialBadge } from "@/components/ui/material-badge"
@@ -39,7 +40,7 @@ const formatCCAmount = (amount: number): string => {
 }
 
 // Demo user data
-const demoUser = {
+const userData = {
   id: "demo-user-123",
   name: "User Profile",
   username: "@userprofile",
@@ -377,6 +378,47 @@ const demoRankingHistory = [
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("overview")
   const router = useRouter()
+  const { user, isAuthenticated } = useAuth()
+
+  // Redirect if not authenticated
+  if (!isAuthenticated) {
+    router.push("/login")
+    return null
+  }
+
+  // Use real user data or fallback to demo data
+  const userData = user ? {
+    id: user.id,
+    name: user.name || user.email?.split('@')[0] || 'User',
+    username: user.username || `@${user.email?.split('@')[0] || 'user'}`,
+    email: user.email || 'user@codarena.com',
+    bio: "Welcome to Codarena! Start your coding journey today.",
+    avatar: "/placeholder.svg?height=120&width=120",
+    joinDate: new Date().toISOString().split('T')[0],
+    rank: "Bronze",
+    level: 1,
+    xp: 0,
+    contestsParticipated: 0,
+    contestsWon: 0,
+    totalEarnings: 0,
+    winRate: 0,
+    averageRank: 0,
+    bestRank: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    problemsSolved: 0,
+    accuracy: 0,
+    averageTime: 0,
+    favoriteLanguage: "Python",
+    achievements: [],
+    recentActivity: [],
+    contestHistory: [],
+    socialStats: {
+      followers: 0,
+      following: 0,
+      friends: 0
+    }
+  } : userData
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -448,33 +490,33 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             <div className="relative">
               <img
-                src={demoUser.avatar || "/placeholder.svg"}
-                alt={demoUser.name}
+                src={userData.avatar || "/placeholder.svg"}
+                alt={userData.name}
                 className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
               />
               <div className="absolute -bottom-2 -right-2 bg-yellow-500 rounded-full p-2">
-                {getRankIcon(demoUser.rank)}
+                {getRankIcon(userData.rank)}
               </div>
             </div>
 
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{demoUser.name}</h1>
-                  <p className="text-gray-600 text-lg">{demoUser.username}</p>
-                  <p className="text-gray-700 mt-2 max-w-2xl">{demoUser.bio}</p>
+                  <h1 className="text-3xl font-bold text-gray-900">{userData.name}</h1>
+                  <p className="text-gray-600 text-lg">{userData.username}</p>
+                  <p className="text-gray-700 mt-2 max-w-2xl">{userData.bio}</p>
                 </div>
                 <div className="flex flex-col sm:items-end gap-2">
                   <MaterialBadge
                     variant="default"
                     size="medium"
-                    className={`${getRankColor(demoUser.rank)} bg-yellow-100`}
+                    className={`${getRankColor(userData.rank)} bg-yellow-100`}
                   >
-                    {getRankIcon(demoUser.rank)}
-                    <span className="ml-1">{demoUser.rank} Rank</span>
+                    {getRankIcon(userData.rank)}
+                    <span className="ml-1">{userData.rank} Rank</span>
                   </MaterialBadge>
                   <div className="text-sm text-gray-600">
-                    Global Rank: <span className="font-semibold">#{demoUser.globalRank}</span>
+                    Global Rank: <span className="font-semibold">#{userData.globalRank}</span>
                   </div>
                 </div>
               </div>
@@ -484,21 +526,21 @@ export default function ProfilePage() {
                 <div className="text-center">
                   <div className="flex items-center gap-2 text-blue-600">
                     <Users className="h-4 w-4" />
-                    <span className="font-bold text-lg">{demoUser.followers}</span>
+                    <span className="font-bold text-lg">{userData.followers}</span>
                   </div>
                   <div className="text-sm text-gray-600">Followers</div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center gap-2 text-green-600">
                     <UserPlus className="h-4 w-4" />
-                    <span className="font-bold text-lg">{demoUser.following}</span>
+                    <span className="font-bold text-lg">{userData.following}</span>
                   </div>
                   <div className="text-sm text-gray-600">Following</div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center gap-2 text-purple-600">
                     <Heart className="h-4 w-4" />
-                    <span className="font-bold text-lg">{demoUser.friends}</span>
+                    <span className="font-bold text-lg">{userData.friends}</span>
                   </div>
                   <div className="text-sm text-gray-600">Friends</div>
                 </div>
@@ -513,7 +555,7 @@ export default function ProfilePage() {
             <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-4">
               <Trophy className="h-6 w-6 text-blue-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{demoUser.points.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-gray-900">{userData.points.toLocaleString()}</div>
             <div className="text-sm text-gray-600">Total Points</div>
           </MaterialCard>
 
@@ -521,7 +563,7 @@ export default function ProfilePage() {
             <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg mx-auto mb-4">
               <Target className="h-6 w-6 text-green-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{demoUser.problemsSolved}</div>
+            <div className="text-2xl font-bold text-gray-900">{userData.problemsSolved}</div>
             <div className="text-sm text-gray-600">Problems Solved</div>
           </MaterialCard>
 
@@ -529,7 +571,7 @@ export default function ProfilePage() {
             <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-lg mx-auto mb-4">
               <Flame className="h-6 w-6 text-orange-600" />
             </div>
-            <div className="text-2xl font-bold text-gray-900">{demoUser.streak}</div>
+            <div className="text-2xl font-bold text-gray-900">{userData.streak}</div>
             <div className="text-sm text-gray-600">Day Streak</div>
           </MaterialCard>
 
@@ -539,7 +581,7 @@ export default function ProfilePage() {
             </div>
             <div className="text-2xl font-bold text-green-600 flex items-center gap-2">
               <Coins className="h-6 w-6" />
-              {formatCCAmount(demoUser.totalEarnings)}
+              {formatCCAmount(userData.totalEarnings)}
             </div>
             <div className="text-sm text-gray-600">Total Earnings</div>
           </MaterialCard>
@@ -550,15 +592,15 @@ export default function ProfilePage() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Contest Performance</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{demoUser.contestPoints}</div>
+              <div className="text-2xl font-bold text-purple-600">{userData.contestPoints}</div>
               <div className="text-sm text-purple-800">Contest Points</div>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">#{demoUser.globalRank}</div>
+              <div className="text-2xl font-bold text-yellow-600">#{userData.globalRank}</div>
               <div className="text-sm text-yellow-800">Global Rank</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{demoUser.contestsWon}</div>
+              <div className="text-2xl font-bold text-green-600">{userData.contestsWon}</div>
               <div className="text-sm text-green-800">Contests Won</div>
             </div>
           </div>
@@ -728,7 +770,7 @@ export default function ProfilePage() {
             {/* Friends */}
             <MaterialCard elevation={1} className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Friends ({demoUser.friends})</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Friends ({userData.friends})</h3>
                 <MaterialButton size="small" variant="outlined">
                   <Eye className="h-4 w-4 mr-1" />
                   View All
@@ -762,7 +804,7 @@ export default function ProfilePage() {
             {/* Followers */}
             <MaterialCard elevation={1} className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Followers ({demoUser.followers})</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Followers ({userData.followers})</h3>
                 <MaterialButton size="small" variant="outlined">
                   <Eye className="h-4 w-4 mr-1" />
                   View All
@@ -793,7 +835,7 @@ export default function ProfilePage() {
             {/* Following */}
             <MaterialCard elevation={1} className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Following ({demoUser.following})</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Following ({userData.following})</h3>
                 <MaterialButton size="small" variant="outlined">
                   <Eye className="h-4 w-4 mr-1" />
                   View All
@@ -830,15 +872,15 @@ export default function ProfilePage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Current Ranking</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-                  <div className="text-3xl font-bold text-purple-600">#{demoUser.globalRank}</div>
+                  <div className="text-3xl font-bold text-purple-600">#{userData.globalRank}</div>
                   <div className="text-sm text-purple-800 mt-1">Global Rank</div>
                 </div>
                 <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-                  <div className="text-3xl font-bold text-blue-600">{demoUser.contestPoints}</div>
+                  <div className="text-3xl font-bold text-blue-600">{userData.contestPoints}</div>
                   <div className="text-sm text-blue-800 mt-1">Contest Points</div>
                 </div>
                 <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-                  <div className="text-3xl font-bold text-green-600">{demoUser.rank}</div>
+                  <div className="text-3xl font-bold text-green-600">{userData.rank}</div>
                   <div className="text-sm text-green-800 mt-1">Current Tier</div>
                 </div>
               </div>

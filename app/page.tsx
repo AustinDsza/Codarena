@@ -1464,7 +1464,18 @@ export default function CodarenaApp() {
                     <span>{formatCCAmount(balance)}</span>
                   </Link>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Welcome, {user?.name}</span>
+                    <span className="text-sm text-gray-600">
+                      Welcome, {user?.name || user?.email?.split('@')[0] || 'User'}!
+                    </span>
+                    <Link href="/profile">
+                      <MaterialButton
+                        variant="outlined"
+                        size="small"
+                        className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                      >
+                        Profile
+                      </MaterialButton>
+                    </Link>
                     <MaterialButton
                       variant="outlined"
                       size="small"

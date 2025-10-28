@@ -140,6 +140,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
+      // Add a small delay to prevent race conditions
+      await new Promise(resolve => setTimeout(resolve, 100))
+
       // Check if user already exists
       const { data: existingUser, error: checkError } = await supabase
         .from('users')

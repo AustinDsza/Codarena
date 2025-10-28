@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase } from './supabase'
+import { supabase, supabaseAdmin } from './supabase'
 
 interface AuthContextType {
   user: User | null
@@ -32,7 +32,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (profile) {
           setUser(profile)
         } else {
-          setUser(session.user)
+          // Fallback to auth user data if profile fetch fails
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+            username: session.user.user_metadata?.username || '@' + (session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user').toLowerCase(),
+            wallet_balance: 1000
+          })
         }
       } else {
         setUser(null)
@@ -57,7 +64,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (profile) {
           setUser(profile)
         } else {
-          setUser(session.user)
+          // Fallback to auth user data if profile fetch fails
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+            username: session.user.user_metadata?.username || '@' + (session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user').toLowerCase(),
+            wallet_balance: 1000
+          })
         }
       } else {
         setUser(null)
@@ -76,6 +90,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (error) {
+        // If table doesn't exist or user not found, return auth user data
+        if (error.code === 'PGRST116' || error.code === 'PGRST301') {
+          console.log('User profile not found, using auth data')
+          return {
+            id: authUser.id,
+            email: authUser.email,
+            name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'User',
+            username: authUser.user_metadata?.username || '@' + (authUser.user_metadata?.name || authUser.email?.split('@')[0] || 'user').toLowerCase(),
+            wallet_balance: 1000
+          }
+        }
         console.error('Error fetching user profile:', error)
         return null
       }
@@ -89,11 +114,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const createUserProfile = async (user: User) => {
     try {
-      const { data: existingUser } = await supabase
+      // Check if user already exists
+      const { data: existingUser, error: checkError } = await supabase
         .from('users')
         .select('id')
         .eq('id', user.id)
         .single()
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing user:', checkError)
+        return
+      }
 
       if (!existingUser) {
         // Use the service role key for this operation to bypass RLS
@@ -110,6 +141,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           console.log('User profile created successfully')
         }
+      } else {
+        console.log('User profile already exists')
       }
     } catch (error) {
       console.error('Error checking/creating user profile:', error)

@@ -8,7 +8,8 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signUp: (email: string, password: string, name: string) => Promise<{ error: any }>
+  isAuthenticated: boolean
+  signUp: (email: string, password: string, name: string, username: string) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: { name?: string }) => Promise<{ error: any }>
@@ -257,10 +258,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error }
   }
 
+  const isAuthenticated = !!user && !!session
+
+  // Debug logging
+  console.log('Auth state:', {
+    user: user ? { id: user.id, email: user.email, name: user.name } : null,
+    session: session ? { user_id: session.user?.id } : null,
+    isAuthenticated,
+    loading
+  })
+
   const value = {
     user,
     session,
     loading,
+    isAuthenticated,
     signUp,
     signIn,
     signOut,

@@ -59,6 +59,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth-context-supabase"
 
 // Function to format Codarena Coins amount
 const formatCCAmount = (amount: number): string => {
@@ -834,8 +835,29 @@ export default function CreateContestPage() {
   const [showDSAForm, setShowDSAForm] = useState(false)
   const [showDesignForm, setShowDesignForm] = useState(false)
   const [showPrizeCalculator, setShowPrizeCalculator] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   const router = useRouter()
+  const { user, isAuthenticated, loading } = useAuth()
+
+  // Redirect to login if not authenticated
+  if (!loading && !isAuthenticated) {
+    router.push('/login')
+    return null
+  }
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   const [contestForm, setContestForm] = useState<ContestForm>({
     title: "",
@@ -1173,36 +1195,141 @@ export default function CreateContestPage() {
   }
 
   const handleConfirmSubmission = async () => {
+    if (!isAuthenticated || !user) {
+      setError("You must be logged in to create a contest")
+      return
+    }
+
     setIsSubmitting(true)
+    setError(null)
+    setSuccess(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Prepare contest data for API
+      const startDateTime = new Date(`${contestForm.startDate}T${contestForm.startTime}`)
+      const endDateTime = new Date(startDateTime.getTime() + parseInt(contestForm.duration) * 60 * 1000)
 
+      const contestData = {
+        title: contestForm.title,
+        description: contestForm.description,
+        type: contestForm.type,
+        category: contestForm.type, // Using type as category for now
+        entry_fee: parseInt(contestForm.entryFee) || 0,
+        prize_pool: parseInt(contestForm.prizePool) || 0,
+        max_participants: parseInt(contestForm.maxParticipants) || 15,
+        start_time: startDateTime.toISOString(),
+        end_time: endDateTime.toISOString(),
+        difficulty: contestForm.difficulty,
+        visibility: contestForm.visibility,
+        judging: contestForm.judging,
+        winner_criteria: contestForm.winnerCriteria,
+        number_of_winners: parseInt(contestForm.numberOfWinners) || 1,
+        prize_structure: contestForm.prizeStructure,
+        new_user_discount: contestForm.newUserDiscount,
+        battle_mode: contestForm.battleMode,
+        // DSA specific
+        enable_proctoring: contestForm.enableProctoring,
+        copy_paste_tracking: contestForm.copyPasteTracking,
+        tab_switch_detection: contestForm.tabSwitchDetection,
+        image_proctoring: contestForm.imageProctoring,
+        multi_monitor_detection: contestForm.multiMonitorDetection,
+        secure_mode: contestForm.secureMode,
+        plagiarism_detection: contestForm.plagiarismDetection,
+        coding_languages: contestForm.codingLanguages,
+        // UI/UX specific
+        allowed_submissions: contestForm.allowedSubmissions,
+        evaluation_criteria: contestForm.evaluationCriteria,
+        // MCQ specific
+        time_per_question: parseInt(contestForm.timePerQuestion) || 60,
+        randomize_questions: contestForm.randomizeQuestions,
+        show_results: contestForm.showResults,
+        // Problems/Questions
+        problems: [
+          ...contestForm.dsaQuestions.map(q => ({
+            title: q.title,
+            description: q.description,
+            difficulty: q.difficulty,
+            points: 100, // Default points
+            constraints: q.constraints,
+            hints: [],
+            test_cases: q.testCases || [],
+            type: 'dsa'
+          })),
+          ...contestForm.mcqQuestions.map(q => ({
+            title: q.question,
+            description: q.question,
+            difficulty: 'medium', // Default for MCQ
+            points: 50, // Default points
+            constraints: '',
+            hints: [],
+            test_cases: [],
+            type: 'mcq',
+            options: q.options,
+            correct_answer: q.correctAnswer,
+            explanation: q.explanation
+          })),
+          ...contestForm.designProblems.map(p => ({
+            title: p.title,
+            description: p.description,
+            difficulty: p.difficulty,
+            points: 100, // Default points
+            constraints: '',
+            hints: [],
+            test_cases: [],
+            type: 'design',
+            requirements: p.requirements,
+            deliverables: p.deliverables,
+            evaluation_criteria: p.evaluationCriteria
+          }))
+        ]
+      }
+
+      // Call the API to create contest
+      const response = await fetch('/api/contests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.id}`, // Using user ID as auth for now
+        },
+        body: JSON.stringify(contestData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create contest')
+      }
+
+      const result = await response.json()
+      
       // Generate invitation code for the contest
       const invitationCode = `${contestForm.type.toUpperCase()}-${Date.now().toString(36).toUpperCase()}`
 
       // Store contest data and invitation code in localStorage for the homepage notification
-      const contestData = {
+      const notificationData = {
         title: contestForm.title,
         type: contestForm.type,
         invitationCode,
         isDemo: demoMode,
         createdAt: new Date().toISOString(),
+        contestId: result.contest.id,
       }
 
-      localStorage.setItem("newContestCreated", JSON.stringify(contestData))
+      localStorage.setItem("newContestCreated", JSON.stringify(notificationData))
 
-      // Close modal and redirect to homepage
-      setShowConfirmationModal(false)
-      setIsSubmitting(false)
+      // Show success message
+      setSuccess(`Contest "${contestForm.title}" created successfully!`)
+      
+      // Close modal and redirect to homepage after a short delay
+      setTimeout(() => {
+        setShowConfirmationModal(false)
+        setIsSubmitting(false)
+        router.push("/")
+      }, 2000)
 
-      // Redirect to homepage
-      router.push("/")
     } catch (error) {
       console.error("Error creating contest:", error)
+      setError(error instanceof Error ? error.message : "Failed to create contest. Please try again.")
       setIsSubmitting(false)
-      // Handle error - could show error message
     }
   }
 
@@ -1248,6 +1375,37 @@ export default function CreateContestPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Error/Success Messages */}
+      {error && (
+        <div className="fixed top-4 right-4 z-50 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            <span>{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-2 text-red-500 hover:text-red-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {success && (
+        <div className="fixed top-4 right-4 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5" />
+            <span>{success}</span>
+            <button
+              onClick={() => setSuccess(null)}
+              className="ml-2 text-green-500 hover:text-green-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white shadow-md sticky top-0 z-[var(--z-sticky)]">
         <div className="container mx-auto px-4 py-4">
@@ -1537,12 +1695,12 @@ export default function CreateContestPage() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Submitting...
+                    Creating Contest...
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />
-                    Confirm & Submit
+                    Create Contest
                   </>
                 )}
               </Button>

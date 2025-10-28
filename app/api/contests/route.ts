@@ -59,17 +59,38 @@ export async function POST(request: NextRequest) {
       max_participants,
       start_time,
       end_time,
+      difficulty,
+      visibility,
+      judging,
+      winner_criteria,
+      number_of_winners,
+      prize_structure,
+      new_user_discount,
+      battle_mode,
+      enable_proctoring,
+      copy_paste_tracking,
+      tab_switch_detection,
+      image_proctoring,
+      multi_monitor_detection,
+      secure_mode,
+      plagiarism_detection,
+      coding_languages,
+      allowed_submissions,
+      evaluation_criteria,
+      time_per_question,
+      randomize_questions,
+      show_results,
       problems
     } = body
 
-    // Get user from auth header (you'll need to implement this)
+    // Get user from auth header
     const authHeader = request.headers.get('authorization')
     if (!authHeader) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // For now, we'll use a mock user ID - in production, extract from JWT
-    const creator_id = 'mock-user-id'
+    // Extract user ID from Bearer token (for now, using the token as user ID)
+    const creator_id = authHeader.replace('Bearer ', '')
 
     // Create contest
     const { data: contest, error: contestError } = await supabase
@@ -85,6 +106,27 @@ export async function POST(request: NextRequest) {
         max_participants,
         start_time,
         end_time,
+        difficulty,
+        visibility,
+        judging,
+        winner_criteria,
+        number_of_winners,
+        prize_structure,
+        new_user_discount,
+        battle_mode,
+        enable_proctoring,
+        copy_paste_tracking,
+        tab_switch_detection,
+        image_proctoring,
+        multi_monitor_detection,
+        secure_mode,
+        plagiarism_detection,
+        coding_languages,
+        allowed_submissions,
+        evaluation_criteria,
+        time_per_question,
+        randomize_questions,
+        show_results,
         is_live: false,
         is_featured: false,
       })
@@ -103,10 +145,17 @@ export async function POST(request: NextRequest) {
         title: problem.title,
         description: problem.description,
         difficulty: problem.difficulty,
-        points: problem.points,
-        constraints: problem.constraints || [],
+        points: problem.points || 100,
+        constraints: problem.constraints || '',
         hints: problem.hints || [],
         test_cases: problem.test_cases || [],
+        type: problem.type || 'dsa',
+        options: problem.options || [],
+        correct_answer: problem.correct_answer || 0,
+        explanation: problem.explanation || '',
+        requirements: problem.requirements || [],
+        deliverables: problem.deliverables || [],
+        evaluation_criteria: problem.evaluation_criteria || '',
       }))
 
       const { error: problemsError } = await supabase

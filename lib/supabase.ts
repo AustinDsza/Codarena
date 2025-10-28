@@ -15,7 +15,11 @@ if (!supabaseServiceRoleKey) {
   console.warn('Missing SUPABASE_SERVICE_ROLE_KEY environment variable - some admin operations may fail')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+  },
+})
 
 // Server-side client with service role key for admin operations
 export const supabaseAdmin = createClient(

@@ -28,19 +28,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
       
       if (session?.user) {
-        const profile = await fetchUserProfile(session.user)
-        if (profile) {
-          setUser(profile)
-        } else {
-          // Fallback to auth user data if profile fetch fails
-          setUser({
-            id: session.user.id,
-            email: session.user.email,
-            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-            username: session.user.user_metadata?.username || '@' + (session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user').toLowerCase(),
-            wallet_balance: 1000
-          })
+        // Use auth user data immediately for faster initial load
+        const userData = {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+          username: session.user.user_metadata?.username || '@' + (session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user').toLowerCase(),
+          wallet_balance: 1000
         }
+        
+        setUser(userData)
+        
+        // Fetch updated profile from database in background (async)
+        fetchUserProfile(session.user).then(profile => {
+          if (profile) {
+            setUser(profile)
+          }
+        }).catch(console.error)
       } else {
         setUser(null)
       }
@@ -54,25 +58,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
 
       if (session?.user) {
-        // Create user profile if new user
+        // Create user profile if new user (async, don't wait)
         if (event === 'SIGNED_IN') {
-          await createUserProfile(session.user)
+          createUserProfile(session.user).catch(console.error)
         }
         
-        // Fetch user profile from database
-        const profile = await fetchUserProfile(session.user)
-        if (profile) {
-          setUser(profile)
-        } else {
-          // Fallback to auth user data if profile fetch fails
-          setUser({
-            id: session.user.id,
-            email: session.user.email,
-            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-            username: session.user.user_metadata?.username || '@' + (session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user').toLowerCase(),
-            wallet_balance: 1000
-          })
+        // Use auth user data immediately for faster login
+        const userData = {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+          username: session.user.user_metadata?.username || '@' + (session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'user').toLowerCase(),
+          wallet_balance: 1000
         }
+        
+        setUser(userData)
+        
+        // Fetch updated profile from database in background (async)
+        fetchUserProfile(session.user).then(profile => {
+          if (profile) {
+            setUser(profile)
+          }
+        }).catch(console.error)
       } else {
         setUser(null)
       }

@@ -824,8 +824,8 @@ function DesignProblemForm({ problem, onSave, onCancel }: {
 export default function CreateContestPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [userTier, setUserTier] = useState<"regular" | "verified">("regular")
-  const [demoMode, setDemoMode] = useState(false)
-  const [showDemoModal, setShowDemoModal] = useState(false)
+  const [demoMode, setDemoMode] = useState(false) // Always false - no demo mode
+  // Demo modal removed
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [editingMCQ, setEditingMCQ] = useState<MCQQuestion | null>(null)
@@ -1100,39 +1100,7 @@ export default function CreateContestPage() {
     }
   }
 
-  const handleDemoModeSelection = (mode: "user" | "organization") => {
-    setDemoMode(true)
-    if (mode === "user") {
-      setUserTier("regular")
-      setContestForm((prev) => ({
-        ...prev,
-        maxParticipants: "15",
-        visibility: "private",
-        copyPasteTracking: true,
-        tabSwitchDetection: true,
-        enableProctoring: false,
-        imageProctoring: false,
-        multiMonitorDetection: false,
-        secureMode: false,
-        plagiarismDetection: false,
-      }))
-    } else {
-      setUserTier("verified")
-      setContestForm((prev) => ({
-        ...prev,
-        maxParticipants: "",
-        visibility: "public",
-        copyPasteTracking: false,
-        tabSwitchDetection: false,
-        enableProctoring: false,
-        imageProctoring: false,
-        multiMonitorDetection: false,
-        secureMode: false,
-        plagiarismDetection: false,
-      }))
-    }
-    setShowDemoModal(false)
-  }
+  // Demo mode removed - always create real contests
 
   const exitDemoMode = () => {
     setDemoMode(false)
@@ -1427,26 +1395,11 @@ export default function CreateContestPage() {
                   <Settings className="h-6 w-6 text-white" />
                 </div>
                 <span className="text-2xl font-medium text-gray-900">Create Contest</span>
-                {demoMode && (
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200">
-                    <PlayCircle className="h-3 w-3 mr-1" />
-                    Demo Mode - {userTier === "regular" ? "User View" : "Organization View"}
-                  </Badge>
-                )}
+                {/* Demo mode badge removed */}
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {demoMode && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={exitDemoMode}
-                  className="text-red-600 border-red-200 hover:bg-red-50 bg-transparent"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Exit Demo
-                </Button>
-              )}
+              {/* Exit demo button removed */}
               {userTier === "verified" ? (
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium border shadow-md flex items-center gap-2">
                   <Crown className="h-4 w-4" />
@@ -1666,17 +1619,7 @@ export default function CreateContestPage() {
               </div>
             </div>
 
-            {demoMode && (
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 text-orange-800">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span className="font-medium">Demo Mode</span>
-                </div>
-                <p className="text-sm text-orange-700 mt-1">
-                  This is a demo submission. No actual contest will be created.
-                </p>
-              </div>
-            )}
+            {/* Demo mode warning removed - contests are always real */}
 
             <div className="flex gap-3">
               <Button
@@ -3147,22 +3090,7 @@ export default function CreateContestPage() {
                     </Card>
                   )}
 
-                  {demoMode && (
-                    <Card className="border-orange-200 bg-orange-50">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-orange-800">
-                          <PlayCircle className="h-5 w-5" />
-                          Demo Mode Active
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-orange-700">
-                          You are in demo mode as a {userTier === "regular" ? "Regular User" : "Verified Organization"}.
-                          This contest will not be actually created, but you can experience the full creation flow.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
+                  {/* Demo mode removed - contests are always real */}
                 </div>
               </div>
             )}

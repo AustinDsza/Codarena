@@ -33,7 +33,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const router = useRouter()
-  const { login } = useAuth()
+  const { signUp, signIn } = useAuth()
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -71,18 +71,22 @@ export default function RegisterPage() {
 
     try {
       if (!validateForm()) {
+        setIsLoading(false)
         return
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Register with Supabase
+      const { error: signUpError } = await signUp(
+        formData.email,
+        formData.password,
+        formData.name
+      )
 
-      // Store user session
-      login({
-        name: formData.name,
-        email: formData.email,
-        isDemo: false
-      })
+      if (signUpError) {
+        console.error('Registration error:', signUpError)
+        setError(signUpError.message || "Registration failed. Please try again.")
+        return
+      }
 
       setSuccess(true)
       
@@ -92,6 +96,7 @@ export default function RegisterPage() {
       }, 1500)
 
     } catch (err) {
+      console.error('Registration error:', err)
       setError("Registration failed. Please try again.")
     } finally {
       setIsLoading(false)

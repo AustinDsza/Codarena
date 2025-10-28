@@ -55,7 +55,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (!existingUser) {
-        const { error } = await supabase.from('users').insert({
+        // Use the service role key for this operation to bypass RLS
+        const { error } = await supabaseAdmin.from('users').insert({
           id: user.id,
           email: user.email!,
           name: user.user_metadata?.name || user.email!.split('@')[0],
@@ -64,6 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (error) {
           console.error('Error creating user profile:', error)
+        } else {
+          console.log('User profile created successfully')
         }
       }
     } catch (error) {

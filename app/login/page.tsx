@@ -26,7 +26,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { login } = useAuth()
+  const { signIn } = useAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,39 +34,27 @@ export default function LoginPage() {
     setError("")
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
       // Simple validation
       if (!email || !password) {
         setError("Please fill in all fields")
+        setIsLoading(false)
         return
       }
 
-      // Demo credentials check
-      if (email === "demo@user.com" && password === "demo123") {
-        // Store demo user session
-        login({
-          name: "Demo User",
-          email: "demo@user.com",
-          isDemo: true
-        })
-        router.push("/")
+      // Login with Supabase
+      const { error: signInError } = await signIn(email, password)
+
+      if (signInError) {
+        console.error('Login error:', signInError)
+        setError(signInError.message || "Login failed. Please try again.")
         return
       }
 
-      // Regular login logic (mock)
-      if (email.includes("@") && password.length >= 6) {
-        login({
-          name: email.split("@")[0],
-          email: email,
-          isDemo: false
-        })
-        router.push("/")
-      } else {
-        setError("Invalid email or password")
-      }
+      // Success - redirect to home
+      router.push("/")
+
     } catch (err) {
+      console.error('Login error:', err)
       setError("Login failed. Please try again.")
     } finally {
       setIsLoading(false)

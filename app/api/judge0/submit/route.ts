@@ -74,6 +74,17 @@ export async function POST(request: NextRequest) {
       memory_limit,
     }
 
+    // Check if API key is configured
+    if (!JUDGE0_API_KEY || JUDGE0_API_KEY === '') {
+      return NextResponse.json(
+        { 
+          error: 'Judge0 API key not configured. Please set JUDGE0_API_KEY in your environment variables.',
+          fallback: true 
+        },
+        { status: 400 }
+      )
+    }
+
     // Submit to Judge0
     const response = await fetch(`${JUDGE0_API_URL}/submissions`, {
       method: 'POST',

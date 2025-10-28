@@ -58,7 +58,7 @@ export class ContestMonitoringService {
     // Create a visible video element for face display in corner
     this.faceDisplayElement = document.createElement('video')
     this.faceDisplayElement.style.position = 'fixed'
-    this.faceDisplayElement.style.top = '80px' // Position below monitoring status
+          this.faceDisplayElement.style.top = '120px' // Position below monitoring status and language selection
     this.faceDisplayElement.style.right = '20px'
     this.faceDisplayElement.style.width = '120px'
     this.faceDisplayElement.style.height = '90px'

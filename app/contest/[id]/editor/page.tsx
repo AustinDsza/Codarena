@@ -1102,19 +1102,26 @@ int main() {
             </div>
 
             {/* Language Selection - Moved to avoid facecam overlap */}
-            <div className="flex items-center justify-end mb-4">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Language:</label>
+                <label className="text-sm text-gray-600 font-medium">Language:</label>
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm bg-white shadow-lg"
+                  className="px-3 py-2 border border-gray-300 rounded-md text-sm bg-white shadow-lg z-50 relative min-w-[120px]"
                 >
                   <option value="python">Python</option>
                   <option value="javascript">JavaScript</option>
                   <option value="java">Java</option>
                   <option value="cpp">C++</option>
+                  <option value="c">C</option>
+                  <option value="csharp">C#</option>
+                  <option value="go">Go</option>
+                  <option value="rust">Rust</option>
                 </select>
+              </div>
+              <div className="text-xs text-gray-500">
+                💡 Tip: Use the language dropdown to change syntax highlighting
               </div>
             </div>
 

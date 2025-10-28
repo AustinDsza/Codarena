@@ -36,7 +36,7 @@ class Judge0Service {
   private baseUrl = '/api/judge0'
 
   // Submit code for execution
-  async submitCode(submission: Judge0Submission): Promise<{ success: boolean; token?: string; error?: string }> {
+  async submitCode(submission: Judge0Submission): Promise<{ success: boolean; token?: string; error?: string; fallback?: boolean }> {
     try {
       const response = await fetch(`${this.baseUrl}/submit`, {
         method: 'POST',
@@ -49,6 +49,14 @@ class Judge0Service {
       const data = await response.json()
 
       if (!response.ok) {
+        // Check if it's a configuration error
+        if (data.fallback) {
+          return {
+            success: false,
+            error: 'Judge0 API not configured. Please set up your API key to enable code execution.',
+            fallback: true
+          }
+        }
         return {
           success: false,
           error: data.error || 'Failed to submit code'

@@ -274,6 +274,20 @@ export function CodeExecution({
             <div className="text-center py-4">
               <XCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
               <p className="text-red-600 font-medium">{executionResult.error}</p>
+              {executionResult.fallback && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">Setup Required</h4>
+                  <p className="text-sm text-blue-800 mb-3">
+                    To enable code execution, you need to configure the Judge0 API key.
+                  </p>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <p>1. Get API key from <a href="https://rapidapi.com/judge0-official/api/judge0-ce/" target="_blank" rel="noopener noreferrer" className="underline">RapidAPI Judge0</a></p>
+                    <p>2. Add to your .env.local file:</p>
+                    <code className="block bg-blue-100 p-2 rounded mt-1">JUDGE0_API_KEY=your_api_key_here</code>
+                    <p>3. Restart the development server</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </MaterialCard>

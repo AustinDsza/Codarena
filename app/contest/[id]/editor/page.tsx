@@ -26,6 +26,7 @@ import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { contestMonitoring } from "@/lib/contest-monitoring"
+import { CodeExecution } from "@/components/CodeExecution"
 import {
   FullscreenWarningDialog,
   FaceDetectionWarningDialog,
@@ -78,6 +79,28 @@ const getContestById = (id: string) => {
           ],
           constraints: ["1 ≤ nums.length ≤ 10^5", "-10^4 ≤ nums[i] ≤ 10^4"],
           hints: ["Think about dynamic programming approach", "Consider Kadane's algorithm for optimal solution"],
+          testCases: [
+            {
+              input: "[-2,1,-3,4,-1,2,1,-5,4]",
+              expectedOutput: "6",
+              description: "Example test case"
+            },
+            {
+              input: "[1]",
+              expectedOutput: "1",
+              description: "Single element array"
+            },
+            {
+              input: "[5,4,-1,7,8]",
+              expectedOutput: "23",
+              description: "All positive elements"
+            },
+            {
+              input: "[-1,-2,-3]",
+              expectedOutput: "-1",
+              description: "All negative elements"
+            }
+          ]
         },
         {
           id: 2,
@@ -94,6 +117,28 @@ const getContestById = (id: string) => {
           ],
           constraints: ["1 ≤ s.length ≤ 1000", "s consists of only digits and English letters"],
           hints: ["Consider expanding around centers", "Dynamic programming can also solve this efficiently"],
+          testCases: [
+            {
+              input: '"babad"',
+              expectedOutput: '"bab"',
+              description: "Example test case"
+            },
+            {
+              input: '"cbbd"',
+              expectedOutput: '"bb"',
+              description: "Even length palindrome"
+            },
+            {
+              input: '"a"',
+              expectedOutput: '"a"',
+              description: "Single character"
+            },
+            {
+              input: '"ac"',
+              expectedOutput: '"a"',
+              description: "No palindrome, return first character"
+            }
+          ]
         },
         {
           id: 3,
@@ -110,6 +155,23 @@ const getContestById = (id: string) => {
           ],
           constraints: ["1 ≤ n ≤ 100 (number of nodes)", "0 ≤ weight ≤ 100"],
           hints: ["Dijkstra's algorithm is perfect for this", "Consider using a priority queue for efficiency"],
+          testCases: [
+            {
+              input: "[[0,1,4],[1,2,2],[2,3,1]]\n0\n3",
+              expectedOutput: "7",
+              description: "Example test case"
+            },
+            {
+              input: "[[0,1,1],[1,2,1]]\n0\n2",
+              expectedOutput: "2",
+              description: "Simple path"
+            },
+            {
+              input: "[[0,1,1]]\n0\n1",
+              expectedOutput: "1",
+              description: "Direct connection"
+            }
+          ]
         },
       ],
       rules: [
@@ -1059,21 +1121,6 @@ int main() {
             {/* Editor Actions */}
             <div className="flex items-center gap-2">
               <MaterialButton
-                variant="outlined"
-                size="small"
-                onClick={handleRunCode}
-                disabled={isRunning}
-                startIcon={
-                  isRunning ? (
-                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Play className="h-4 w-4" />
-                  )
-                }
-              >
-                {isRunning ? "Running..." : "Run"}
-              </MaterialButton>
-              <MaterialButton
                 variant="contained"
                 size="small"
                 onClick={handleSubmitCode}
@@ -1128,12 +1175,17 @@ int main() {
             </div>
           </div>
 
-          {/* Output Panel */}
+          {/* Code Execution Panel */}
           <div className="border-t border-gray-200 p-4 bg-gray-50">
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">Output</h3>
-            <div className="bg-black text-green-400 font-mono text-sm p-3 rounded-md min-h-[100px] max-h-[200px] overflow-y-auto whitespace-pre-wrap">
-              {codeOutput}
-            </div>
+            <CodeExecution
+              code={code}
+              language={language}
+              testCases={problem?.testCases || []}
+              onExecutionComplete={(result) => {
+                console.log('Execution completed:', result)
+                // You can handle the result here, e.g., update score, save to history, etc.
+              }}
+            />
           </div>
         </div>
       </div>

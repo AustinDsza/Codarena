@@ -54,6 +54,8 @@ import {
   Send,
   X,
   Coins,
+  Upload,
+  Download,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -345,6 +347,73 @@ function MCQQuestionForm({ question, onSave, onCancel }: {
     onSave(formData)
   }
 
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const csv = e.target?.result as string
+      const lines = csv.split('\n').filter(line => line.trim())
+      
+      if (lines.length < 2) {
+        alert('CSV must have at least a header row and one data row')
+        return
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim())
+      const requiredHeaders = ['question', 'option1', 'option2', 'option3', 'option4', 'correctAnswer']
+      
+      if (!requiredHeaders.every(h => headers.includes(h))) {
+        alert('CSV must have columns: question, option1, option2, option3, option4, correctAnswer')
+        return
+      }
+
+      const questions: MCQQuestion[] = []
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim())
+        if (values.length >= 6) {
+          const correctAnswer = parseInt(values[5]) - 1 // Convert to 0-based index
+          if (correctAnswer >= 0 && correctAnswer < 4) {
+            questions.push({
+              id: Date.now().toString() + i,
+              question: values[0],
+              options: [values[1], values[2], values[3], values[4]],
+              correctAnswer: correctAnswer,
+              explanation: values[6] || '',
+            })
+          }
+        }
+      }
+
+      if (questions.length > 0) {
+        // Add all questions to the contest form
+        questions.forEach(q => onSave(q))
+        alert(`Successfully imported ${questions.length} questions from CSV`)
+      } else {
+        alert('No valid questions found in CSV')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const downloadSampleCSV = () => {
+    const sampleData = `question,option1,option2,option3,option4,correctAnswer,explanation
+"What is the capital of France?","London","Paris","Berlin","Madrid",2,"Paris is the capital and largest city of France."
+"What is 2 + 2?","3","4","5","6",2,"2 + 2 equals 4."
+"What is the largest planet in our solar system?","Earth","Jupiter","Saturn","Mars",2,"Jupiter is the largest planet in our solar system."`
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'sample_mcq_questions.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-4">
       <div>
@@ -360,33 +429,33 @@ function MCQQuestionForm({ question, onSave, onCancel }: {
 
       <div>
         <Label>Options</Label>
-        <div className="space-y-2 mt-2">
-          {formData.options.map((option, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <RadioGroup
-                value={formData.correctAnswer.toString()}
-                onValueChange={(value) => setFormData({ ...formData, correctAnswer: parseInt(value) })}
-              >
+        <RadioGroup
+          value={formData.correctAnswer.toString()}
+          onValueChange={(value) => setFormData({ ...formData, correctAnswer: parseInt(value) })}
+        >
+          <div className="space-y-2 mt-2">
+            {formData.options.map((option, index) => (
+              <div key={index} className="flex items-center gap-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value={index.toString()} id={`option-${index}`} />
                   <Label htmlFor={`option-${index}`} className="text-sm font-normal">
                     Option {index + 1}
                   </Label>
                 </div>
-              </RadioGroup>
-              <Input
-                value={option}
-                onChange={(e) => {
-                  const newOptions = [...formData.options]
-                  newOptions[index] = e.target.value
-                  setFormData({ ...formData, options: newOptions })
-                }}
-                placeholder={`Option ${index + 1}`}
-                className="flex-1"
-              />
-            </div>
-          ))}
-        </div>
+                <Input
+                  value={option}
+                  onChange={(e) => {
+                    const newOptions = [...formData.options]
+                    newOptions[index] = e.target.value
+                    setFormData({ ...formData, options: newOptions })
+                  }}
+                  placeholder={`Option ${index + 1}`}
+                  className="flex-1"
+                />
+              </div>
+            ))}
+          </div>
+        </RadioGroup>
       </div>
 
       <div>
@@ -398,6 +467,45 @@ function MCQQuestionForm({ question, onSave, onCancel }: {
           placeholder="Explain why this is the correct answer..."
           className="mt-1"
         />
+      </div>
+
+      {/* CSV Upload Section */}
+      <div className="border-t pt-4">
+        <div className="flex items-center justify-between mb-3">
+          <Label className="text-sm font-medium">Bulk Import from CSV</Label>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={downloadSampleCSV}
+            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download Sample CSV
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleCSVUpload}
+            className="hidden"
+            id="csv-upload"
+          />
+          <Label
+            htmlFor="csv-upload"
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 text-sm"
+          >
+            <Upload className="h-4 w-4" />
+            Choose CSV File
+          </Label>
+          <span className="text-xs text-gray-500">
+            Upload multiple questions at once
+          </span>
+        </div>
+        <div className="mt-2 text-xs text-gray-600">
+          <p><strong>CSV Format:</strong> question, option1, option2, option3, option4, correctAnswer, explanation</p>
+          <p><strong>Note:</strong> correctAnswer should be 1-4 (1 for first option, 2 for second, etc.)</p>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
@@ -435,6 +543,74 @@ function DSAProblemForm({ problem, onSave, onCancel }: {
   const handleSave = () => {
     if (!formData.title.trim() || !formData.description.trim()) return
     onSave(formData)
+  }
+
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const csv = e.target?.result as string
+      const lines = csv.split('\n').filter(line => line.trim())
+      
+      if (lines.length < 2) {
+        alert('CSV must have at least a header row and one data row')
+        return
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim())
+      const requiredHeaders = ['title', 'description', 'difficulty', 'timeLimit', 'constraints']
+      
+      if (!requiredHeaders.every(h => headers.includes(h))) {
+        alert('CSV must have columns: title, description, difficulty, timeLimit, constraints')
+        return
+      }
+
+      const problems: DSAQuestion[] = []
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim())
+        if (values.length >= 5) {
+          problems.push({
+            id: Date.now().toString() + i,
+            title: values[0],
+            description: values[1],
+            difficulty: values[2] as "easy" | "medium" | "hard",
+            timeLimit: values[3],
+            memoryLimit: "256",
+            testCases: [],
+            constraints: values[4],
+            examples: [],
+          })
+        }
+      }
+
+      if (problems.length > 0) {
+        // Add all problems to the contest form
+        problems.forEach(p => onSave(p))
+        alert(`Successfully imported ${problems.length} problems from CSV`)
+      } else {
+        alert('No valid problems found in CSV')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const downloadSampleCSV = () => {
+    const sampleData = `title,description,difficulty,timeLimit,constraints
+"Two Sum","Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.","easy","60","2 <= nums.length <= 10^4, -10^9 <= nums[i] <= 10^9, -10^9 <= target <= 10^9"
+"Reverse Linked List","Given the head of a singly linked list, reverse the list and return the reversed list.","medium","120","The number of nodes in the list is in the range [0, 5000]. -5000 <= Node.val <= 5000"
+"Binary Tree Inorder Traversal","Given the root of a binary tree, return the inorder traversal of its nodes' values.","easy","90","The number of nodes in the tree is in the range [0, 100]. -100 <= Node.val <= 100"`
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'sample_dsa_problems.csv'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
   }
 
   return (
@@ -502,6 +678,45 @@ function DSAProblemForm({ problem, onSave, onCancel }: {
           className="mt-1"
           rows={2}
         />
+      </div>
+
+      {/* CSV Upload Section */}
+      <div className="border-t pt-4">
+        <div className="flex items-center justify-between mb-3">
+          <Label className="text-sm font-medium">Bulk Import from CSV</Label>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={downloadSampleCSV}
+            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download Sample CSV
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleCSVUpload}
+            className="hidden"
+            id="dsa-csv-upload"
+          />
+          <Label
+            htmlFor="dsa-csv-upload"
+            className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 text-sm"
+          >
+            <Upload className="h-4 w-4" />
+            Choose CSV File
+          </Label>
+          <span className="text-xs text-gray-500">
+            Upload multiple problems at once
+          </span>
+        </div>
+        <div className="mt-2 text-xs text-gray-600">
+          <p><strong>CSV Format:</strong> title, description, difficulty, timeLimit, constraints</p>
+          <p><strong>Note:</strong> difficulty should be easy, medium, or hard</p>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

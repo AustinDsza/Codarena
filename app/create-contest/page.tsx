@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -867,11 +867,11 @@ export default function CreateContestPage() {
     duration: "",
     startDate: "",
     startTime: "",
-    maxParticipants: userTier === "regular" ? "15" : "",
+    maxParticipants: "15", // Default to 15, will be updated based on userTier
     entryFee: "0",
     prizePool: "",
     prizeType: "free",
-    visibility: userTier === "regular" ? "private" : "public",
+    visibility: "private", // Default to private, will be updated based on userTier
     judging: "auto",
     winnerCriteria: "timing",
     numberOfWinners: "1",
@@ -903,6 +903,15 @@ export default function CreateContestPage() {
     randomizeQuestions: false,
     showResults: true,
   })
+
+  // Update form based on userTier changes
+  useEffect(() => {
+    setContestForm((prev) => ({
+      ...prev,
+      maxParticipants: userTier === "regular" ? "15" : "",
+      visibility: userTier === "regular" ? "private" : "public",
+    }))
+  }, [userTier])
 
   const calculatePrizePool = () => {
     const entryFee = Number.parseFloat(contestForm.entryFee) || 0
